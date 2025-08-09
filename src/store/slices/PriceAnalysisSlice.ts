@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { CAR_DATA } from "@/types/CarData";
+import { api } from "@/lib/api";
 import axios from "axios";
 
 export interface PriceAnalysisRequest {
@@ -43,7 +44,7 @@ export const fetchPriceAnalysis = createAsyncThunk<
   "post/fetchPriceAnalysis",
   async (payload: PriceAnalysisRequest, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post<PriceAnalysisResponse>(
+      const { data } = await api.post<PriceAnalysisResponse>(
         "/api/price-analyze",
         payload,
         { headers: { "Content-Type": "application/json" } },
