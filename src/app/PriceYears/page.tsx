@@ -200,7 +200,7 @@ export default function PriceYears() {
 
     setFilters(searchFilters as SearchFilters);
     loadData(searchFilters as SearchFilters, {});
-  }, []);
+  });
 
   const loadData = async (
     searchFilters: SearchFilters,

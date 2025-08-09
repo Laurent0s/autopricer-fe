@@ -192,7 +192,7 @@ export default function PriceAnalysisPage() {
 
     setFilters(searchFilters);
     loadData(searchFilters, {} as SearchFilters);
-  }, []);
+  });
 
   const loadData = async (
     searchFilters: SearchFilters,
