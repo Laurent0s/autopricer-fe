@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -125,7 +125,105 @@ export default function PriceYears() {
     (_, i) => currentYear - i,
   );
 
+  const loadData = useCallback(
+    async (searchFilters: SearchFilters, searchFilters2: SearchFilters) => {
+      setIsLoading(true);
+      setError("");
+
+      const data = await dispatch(
+        fetchPriceYears({
+          brand: searchFilters.brand!,
+          model: searchFilters.model!,
+          ifusa: excludeUSA ?? false,
+          yearfrom: searchFilters.yearfrom ?? null,
+          yearTo: searchFilters.yearTo ?? null,
+          bodyType: searchFilters.bodyType ?? null,
+          fuel:
+            searchFilters.fuel === "All" ? null : (searchFilters.fuel ?? null),
+          transmission:
+            searchFilters.transmission === "All"
+              ? null
+              : (searchFilters.transmission ?? null),
+          driveType:
+            searchFilters.driveType === "All"
+              ? null
+              : (searchFilters.driveType ?? null),
+          mileageFrom: searchFilters.mileageFrom ?? null,
+          mileageTo: searchFilters.mileageTo ?? null,
+          engineFrom: searchFilters.engineFrom ?? null,
+          engineTo: searchFilters.engineTo ?? null,
+        }),
+      ).unwrap();
+
+      if (
+        isCompareMode &&
+        searchFilters2 &&
+        searchFilters2.brand &&
+        searchFilters2.model
+      ) {
+        const data2 = await dispatch(
+          fetchPriceYears({
+            brand: searchFilters2.brand!,
+            model: searchFilters2.model!,
+            ifusa: excludeUSA ?? false,
+            yearfrom: searchFilters.yearfrom ?? null,
+            yearTo: searchFilters.yearTo ?? null,
+            bodyType: searchFilters.bodyType ?? null,
+            fuel:
+              searchFilters.fuel === "All"
+                ? null
+                : (searchFilters.fuel ?? null),
+            transmission:
+              searchFilters.transmission === "All"
+                ? null
+                : (searchFilters.transmission ?? null),
+            driveType:
+              searchFilters.driveType === "All"
+                ? null
+                : (searchFilters.driveType ?? null),
+            mileageFrom: searchFilters.mileageFrom ?? null,
+            mileageTo: searchFilters.mileageTo ?? null,
+            engineFrom: searchFilters.engineFrom ?? null,
+            engineTo: searchFilters.engineTo ?? null,
+          }),
+        ).unwrap();
+        const brand1 = searchFilters2.brand;
+        const model1 = searchFilters2.model;
+        setData2(data2.data[brand1][model1]);
+      }
+
+      setTimeout(() => {
+        // First car data
+        const brand1 = searchFilters.brand;
+        const model1 = searchFilters.model;
+        if (
+          brand1 &&
+          model1 &&
+          data.data[brand1] &&
+          data.data[brand1][model1]
+        ) {
+          setData(data.data[brand1][model1]);
+        } else {
+          setData(null);
+          if (brand1 && model1) {
+            setError("Дані для обраної марки та моделі відсутні.");
+          }
+        }
+
+        // Second car data
+
+        setIsLoading(false);
+      }, 800);
+    },
+    [dispatch],
+  );
+
+  const didInit = useRef(false);
+
   useEffect(() => {
+    if (didInit.current) return;
+    didInit.current = true;
+
     const urlParams = new URLSearchParams(window.location.search);
     let searchFilters: Partial<SearchFilters> = {};
     const hasBrand = urlParams.has("brand");
@@ -200,93 +298,7 @@ export default function PriceYears() {
 
     setFilters(searchFilters as SearchFilters);
     loadData(searchFilters as SearchFilters, {});
-  });
-
-  const loadData = async (
-    searchFilters: SearchFilters,
-    searchFilters2: SearchFilters,
-  ) => {
-    setIsLoading(true);
-    setError("");
-
-    const data = await dispatch(
-      fetchPriceYears({
-        brand: searchFilters.brand!,
-        model: searchFilters.model!,
-        ifusa: excludeUSA ?? false,
-        yearfrom: searchFilters.yearfrom ?? null,
-        yearTo: searchFilters.yearTo ?? null,
-        bodyType: searchFilters.bodyType ?? null,
-        fuel:
-          searchFilters.fuel === "All" ? null : (searchFilters.fuel ?? null),
-        transmission:
-          searchFilters.transmission === "All"
-            ? null
-            : (searchFilters.transmission ?? null),
-        driveType:
-          searchFilters.driveType === "All"
-            ? null
-            : (searchFilters.driveType ?? null),
-        mileageFrom: searchFilters.mileageFrom ?? null,
-        mileageTo: searchFilters.mileageTo ?? null,
-        engineFrom: searchFilters.engineFrom ?? null,
-        engineTo: searchFilters.engineTo ?? null,
-      }),
-    ).unwrap();
-
-    if (
-      isCompareMode &&
-      searchFilters2 &&
-      searchFilters2.brand &&
-      searchFilters2.model
-    ) {
-      const data2 = await dispatch(
-        fetchPriceYears({
-          brand: searchFilters2.brand!,
-          model: searchFilters2.model!,
-          ifusa: excludeUSA ?? false,
-          yearfrom: searchFilters.yearfrom ?? null,
-          yearTo: searchFilters.yearTo ?? null,
-          bodyType: searchFilters.bodyType ?? null,
-          fuel:
-            searchFilters.fuel === "All" ? null : (searchFilters.fuel ?? null),
-          transmission:
-            searchFilters.transmission === "All"
-              ? null
-              : (searchFilters.transmission ?? null),
-          driveType:
-            searchFilters.driveType === "All"
-              ? null
-              : (searchFilters.driveType ?? null),
-          mileageFrom: searchFilters.mileageFrom ?? null,
-          mileageTo: searchFilters.mileageTo ?? null,
-          engineFrom: searchFilters.engineFrom ?? null,
-          engineTo: searchFilters.engineTo ?? null,
-        }),
-      ).unwrap();
-      const brand1 = searchFilters2.brand;
-      const model1 = searchFilters2.model;
-      setData2(data2.data[brand1][model1]);
-    }
-
-    setTimeout(() => {
-      // First car data
-      const brand1 = searchFilters.brand;
-      const model1 = searchFilters.model;
-      if (brand1 && model1 && data.data[brand1] && data.data[brand1][model1]) {
-        setData(data.data[brand1][model1]);
-      } else {
-        setData(null);
-        if (brand1 && model1) {
-          setError("Дані для обраної марки та моделі відсутні.");
-        }
-      }
-
-      // Second car data
-
-      setIsLoading(false);
-    }, 800);
-  };
+  }, [loadData]);
 
   const validateYears = (currentFilters: SearchFilters) => {
     const yearfrom = parseInt(String(currentFilters.yearfrom));
