@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { DollarSign, Search, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -113,7 +113,7 @@ export default function BudgetFinderPage() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     setIsSearching(true);
     setLimit(10);
     const data = await dispatch(
@@ -139,11 +139,11 @@ export default function BudgetFinderPage() {
     setResults(data.data);
     setTotalOffers(Number(data.totalOffers));
     setIsSearching(false);
-  };
+  }, [dispatch, filters, page, limit, excludeUSA]);
 
   useEffect(() => {
     handleSearch();
-  }, [page]);
+  }, [handleSearch]);
 
   const [mileageDraft, setMileageDraft] = useState<RangeTuple>([
     filters?.mileageFrom ?? 0,
