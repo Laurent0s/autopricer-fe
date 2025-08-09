@@ -2,7 +2,7 @@
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
-
+// Deploy
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
