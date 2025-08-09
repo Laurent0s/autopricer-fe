@@ -37,7 +37,7 @@ import RangeSlider from "@/components/search/RangeSlider";
 import { useAppDispatch } from "@/store/hooks";
 import { fetchPriceAnalysis } from "@/store/slices/PriceAnalysisSlice";
 
-export const CAR_DATA = {
+const CAR_DATA = {
   Audi: ["A4", "A6", "Q5", "Q7", "A3"],
   BMW: ["3 Series", "5 Series", "X3", "X5", "i3"],
   Chevrolet: ["Cruze", "Malibu", "Equinox", "Camaro", "Aveo"],
