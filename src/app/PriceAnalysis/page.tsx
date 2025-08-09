@@ -73,7 +73,6 @@ type ModelData = {
   totalListings: number;
   priceDistribution: Record<string, number>;
 };
-type Data = Partial<Record<Brand, Record<string, ModelData>>>;
 
 type RangeTuple = number[];
 type fuel = "Бензин" | "Дизель" | "гібрид" | "електро" | "All";
@@ -134,9 +133,6 @@ export default function PriceAnalysisPage() {
       "engineFrom",
       "engineTo",
     ] as const;
-    type NumberKey = (typeof numberKeys)[number];
-    const isNumberKey = (k: keyof SearchFilters): k is NumberKey =>
-      (numberKeys as readonly string[]).includes(k as string);
 
     const allowedKeys = new Set<keyof SearchFilters>([
       "brand",
@@ -417,15 +413,6 @@ export default function PriceAnalysisPage() {
   useEffect(() => {
     setEngineDraft([filters.engineFrom ?? 1, filters.engineTo ?? 4]);
   }, [filters.engineFrom, filters.engineTo]);
-
-  const commitRange =
-    (fromKey: "mileageFrom" | "engineFrom", toKey: "mileageTo" | "engineTo") =>
-    ([min, max]: RangeTuple) =>
-      setFilters((p) =>
-        p[fromKey] === min && p[toKey] === max
-          ? p
-          : { ...p, [fromKey]: min, [toKey]: max },
-      );
 
   if (isLoading) {
     return (

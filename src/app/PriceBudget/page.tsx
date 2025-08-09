@@ -71,73 +71,6 @@ interface MockResult {
   imageUrl: string;
 }
 
-const MOCK_RESULTS: MockResult[] = [
-  {
-    id: 1,
-    brand: "Peugeot",
-    model: "Traveller",
-    generation: "III покоління (2nd PL)",
-    years: "2018-2024",
-    avgPrice: 5000,
-    medianPrice: 6000,
-    listings: 2,
-    engine: "2.0 TSI, 2.5 TDI",
-    transmission: "Механіка, Автомат",
-    fuel: "Бензин, дизель",
-    drive: "FWD, RWD",
-    imageUrl:
-      "https://images.unsplash.com/photo-1617469724584-18a853534a36?q=80&w=1974&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    brand: "BMW",
-    model: "5 Series (G30)",
-    generation: "III покоління",
-    years: "2017-2023",
-    avgPrice: 17500,
-    medianPrice: 18200,
-    listings: 240,
-    engine: "2.0 TDI, 2.5 TDI",
-    transmission: "Автомат",
-    fuel: "Бензин, дизель",
-    drive: "FWD, RWD",
-    imageUrl:
-      "https://images.unsplash.com/photo-1617531322438-28f757d0a597?q=80&w=2070&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    brand: "Dodge",
-    model: "Challenger",
-    generation: "III покоління",
-    years: "2008-2023",
-    avgPrice: 25000,
-    medianPrice: 26500,
-    listings: 150,
-    engine: "3.6 V6, 5.7 HEMI",
-    transmission: "Автомат",
-    fuel: "Бензин",
-    drive: "RWD",
-    imageUrl:
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2070&auto=format&fit=crop",
-  },
-  {
-    id: 4,
-    brand: "BMW",
-    model: "5 Series (G30)",
-    generation: "III покоління",
-    years: "2017-2023",
-    avgPrice: 17500,
-    medianPrice: 18200,
-    listings: 240,
-    engine: "2.0 TDI, 2.5 TDI",
-    transmission: "Автомат",
-    fuel: "Бензин, дизель",
-    drive: "FWD, RWD",
-    imageUrl:
-      "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?q=80&w=1964&auto=format&fit=crop",
-  },
-];
-
 type RangeTuple = number[];
 type engineType = "бензин" | "дизель" | "гібрид" | "електро" | "";
 type transmissionType =
@@ -242,15 +175,6 @@ export default function BudgetFinderPage() {
   useEffect(() => {
     setEngineDraft([filters?.engineFrom ?? 1, filters?.engineTo ?? 4]);
   }, [filters?.engineFrom, filters?.engineTo]);
-
-  const commitRange =
-    (fromKey: "mileageFrom" | "engineFrom", toKey: "mileageTo" | "engineTo") =>
-    ([min, max]: RangeTuple) =>
-      setFilters((p) =>
-        p![fromKey] === min && p![toKey] === max
-          ? p
-          : { ...p, [fromKey]: min, [toKey]: max },
-      );
 
   const handleNext = () => {
     setPage((p) => p + 1);

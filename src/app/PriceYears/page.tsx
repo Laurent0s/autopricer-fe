@@ -76,29 +76,6 @@ type YearlyData = {
   [B in Brand]?: Partial<Record<ModelOf<B>, YearPoint[]>>;
 };
 
-const YEARLY_TEST_DATA: YearlyData = {
-  Porsche: {
-    Cayenne: [
-      { year: 2012, avg_price: 22060, listings: 15 },
-      { year: 2013, avg_price: 24170, listings: 18 },
-      { year: 2014, avg_price: 28240, listings: 33 },
-      { year: 2015, avg_price: 31610, listings: 27 },
-      { year: 2016, avg_price: 34620, listings: 15 },
-      { year: 2017, avg_price: 41760, listings: 3 },
-    ],
-  },
-  Volkswagen: {
-    Touareg: [
-      { year: 2012, avg_price: 17500, listings: 24 },
-      { year: 2013, avg_price: 18320, listings: 27 },
-      { year: 2014, avg_price: 21040, listings: 31 },
-      { year: 2015, avg_price: 21820, listings: 43 },
-      { year: 2016, avg_price: 20210, listings: 18 },
-      { year: 2017, avg_price: 20530, listings: 22 },
-    ],
-  },
-};
-
 type RangeTuple = number[];
 type fuel = "бензин" | "дизель" | "гібрид" | "електро" | "All";
 type transmissionType =
@@ -458,15 +435,6 @@ export default function PriceYears() {
   useEffect(() => {
     setEngineDraft([filters.engineFrom ?? 1, filters.engineTo ?? 4]);
   }, [filters.engineFrom, filters.engineTo]);
-
-  const commitRange =
-    (fromKey: "mileageFrom" | "engineFrom", toKey: "mileageTo" | "engineTo") =>
-    ([min, max]: RangeTuple) =>
-      setFilters((p) =>
-        p[fromKey] === min && p[toKey] === max
-          ? p
-          : { ...p, [fromKey]: min, [toKey]: max },
-      );
 
   if (isLoading) {
     return (
