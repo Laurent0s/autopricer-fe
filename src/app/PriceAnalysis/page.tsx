@@ -123,89 +123,6 @@ export default function PriceAnalysisPage() {
 
   const didInit = useRef(false);
 
-  useEffect(() => {
-    if (didInit.current) return;
-    didInit.current = true;
-
-    const urlParams = new URLSearchParams(window.location.search);
-    let searchFilters: SearchFilters = {};
-    const hasBrand = urlParams.has("brand");
-    const hasModel = urlParams.has("model");
-
-    if (!hasBrand || !hasModel) {
-      setIsLoading(false);
-      return;
-    }
-
-    const numberKeys = [
-      "yearfrom",
-      "yearTo",
-      "mileageFrom",
-      "mileageTo",
-      "engineFrom",
-      "engineTo",
-    ] as const;
-
-    const allowedKeys = new Set<keyof SearchFilters>([
-      "brand",
-      "model",
-      "bodyType",
-      "fuel",
-      "transmission",
-      "driveType",
-      ...numberKeys,
-    ]);
-    const isFilterKey = (k: string): k is keyof SearchFilters =>
-      allowedKeys.has(k as keyof SearchFilters);
-
-    function coerce<K extends keyof SearchFilters>(
-      k: K,
-      raw: string,
-    ): SearchFilters[K] {
-      if (
-        (k === "fuel" ||
-          k === "transmission" ||
-          k === "driveType" ||
-          k === "bodyType") &&
-        raw === "All"
-      ) {
-        return null as SearchFilters[K];
-      }
-      if (k === "brand") return raw as Brand as SearchFilters[K];
-      if (k === "model") return (raw ?? "") as SearchFilters[K];
-
-      const numberKeys = new Set<keyof SearchFilters>([
-        "yearfrom",
-        "yearTo",
-        "mileageFrom",
-        "mileageTo",
-        "engineFrom",
-        "engineTo",
-      ]);
-      if (numberKeys.has(k))
-        return (raw ? Number(raw) : null) as SearchFilters[K];
-
-      return (raw || null) as SearchFilters[K];
-    }
-
-    for (const [rawKey, rawValue] of urlParams.entries()) {
-      if (rawKey === "excludeUSA") {
-        setExcludeUSA(rawValue === "true");
-        continue;
-      }
-      if (isFilterKey(rawKey)) {
-        const k = rawKey as keyof SearchFilters;
-        searchFilters = {
-          ...searchFilters,
-          [k]: coerce(k, rawValue),
-        } as SearchFilters;
-      }
-    }
-
-    setFilters(searchFilters);
-    loadData(searchFilters, {} as SearchFilters);
-  }, []);
-
   const loadData = useCallback(
     async (searchFilters: SearchFilters, searchFilters2: SearchFilters) => {
       const data = await dispatch(
@@ -298,6 +215,89 @@ export default function PriceAnalysisPage() {
     },
     [dispatch, excludeUSA, isCompareMode],
   );
+
+  useEffect(() => {
+    if (didInit.current) return;
+    didInit.current = true;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let searchFilters: SearchFilters = {};
+    const hasBrand = urlParams.has("brand");
+    const hasModel = urlParams.has("model");
+
+    if (!hasBrand || !hasModel) {
+      setIsLoading(false);
+      return;
+    }
+
+    const numberKeys = [
+      "yearfrom",
+      "yearTo",
+      "mileageFrom",
+      "mileageTo",
+      "engineFrom",
+      "engineTo",
+    ] as const;
+
+    const allowedKeys = new Set<keyof SearchFilters>([
+      "brand",
+      "model",
+      "bodyType",
+      "fuel",
+      "transmission",
+      "driveType",
+      ...numberKeys,
+    ]);
+    const isFilterKey = (k: string): k is keyof SearchFilters =>
+      allowedKeys.has(k as keyof SearchFilters);
+
+    function coerce<K extends keyof SearchFilters>(
+      k: K,
+      raw: string,
+    ): SearchFilters[K] {
+      if (
+        (k === "fuel" ||
+          k === "transmission" ||
+          k === "driveType" ||
+          k === "bodyType") &&
+        raw === "All"
+      ) {
+        return null as SearchFilters[K];
+      }
+      if (k === "brand") return raw as Brand as SearchFilters[K];
+      if (k === "model") return (raw ?? "") as SearchFilters[K];
+
+      const numberKeys = new Set<keyof SearchFilters>([
+        "yearfrom",
+        "yearTo",
+        "mileageFrom",
+        "mileageTo",
+        "engineFrom",
+        "engineTo",
+      ]);
+      if (numberKeys.has(k))
+        return (raw ? Number(raw) : null) as SearchFilters[K];
+
+      return (raw || null) as SearchFilters[K];
+    }
+
+    for (const [rawKey, rawValue] of urlParams.entries()) {
+      if (rawKey === "excludeUSA") {
+        setExcludeUSA(rawValue === "true");
+        continue;
+      }
+      if (isFilterKey(rawKey)) {
+        const k = rawKey as keyof SearchFilters;
+        searchFilters = {
+          ...searchFilters,
+          [k]: coerce(k, rawValue),
+        } as SearchFilters;
+      }
+    }
+
+    setFilters(searchFilters);
+    loadData(searchFilters, {} as SearchFilters);
+  }, [loadData]);
 
   const validateYears = (currentFilters: SearchFilters) => {
     const yearfrom = parseInt(String(currentFilters.yearfrom));
