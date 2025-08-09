@@ -123,7 +123,14 @@ export default function PriceAnalysisPage() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    let searchFilters: SearchFilters = {}; // ✅ not Partial<Partial<...>>
+    let searchFilters: SearchFilters = {};
+    const hasBrand = urlParams.has("brand");
+    const hasModel = urlParams.has("model");
+
+    if (!hasBrand || !hasModel) {
+      setIsLoading(false);
+      return;
+    }
 
     const numberKeys = [
       "yearfrom",
