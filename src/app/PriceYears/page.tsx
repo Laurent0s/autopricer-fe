@@ -33,6 +33,8 @@ import BodyTypeSelector from "@/components/search/BodyTypeSelector";
 import RangeSlider from "@/components/search/RangeSlider";
 import YearlyPriceChart from "@/components/analytics/YearlyPriceChart";
 import YearlyMetricsCards from "@/components/analytics/YearlyMetricsCards";
+import { useAppDispatch } from "@/store/hooks";
+import { fetchPriceYears } from "@/store/slices/PriceYearsSlice";
 
 const CAR_DATA = {
   Audi: ["A4", "A6", "Q5", "Q7", "A3"],
@@ -62,6 +64,12 @@ const CAR_DATA = {
   ЗАЗ: ["Sens", "Lanos", "Forza", "Vida", "Tavria"],
 };
 
+type Data = {
+  averagePriceFrom: string;
+  averagePriceTo: string;
+  quantity: string;
+  years: YearPoint[];
+};
 type YearPoint = { year: number; avg_price: number; listings: number };
 type ModelOf<B extends Brand> = (typeof CAR_DATA)[B][number];
 type YearlyData = {
@@ -92,40 +100,42 @@ const YEARLY_TEST_DATA: YearlyData = {
 };
 
 type RangeTuple = number[];
-type engineType = "бензин" | "дизель" | "гібрид" | "електро" | "";
+type fuel = "бензин" | "дизель" | "гібрид" | "електро" | "All";
 type transmissionType =
   | "механіка"
   | "автомат_всі"
   | "автомат"
   | "робот"
   | "варіатор"
-  | "";
-type driveType = "fwd" | "rwd" | "awd" | "";
+  | "All";
+type driveType = "fwd" | "rwd" | "awd" | "All";
 
 type SearchFilterMap = {
-  brand?: keyof typeof CAR_DATA;
-  model?: string;
-  yearFrom?: string;
-  yearTo?: string;
-  bodyType?: string;
-  engineType?: engineType;
-  transmission?: transmissionType;
-  driveType?: driveType;
-  mileageRange?: RangeTuple;
-  engineVolume?: RangeTuple;
+  brand: keyof typeof CAR_DATA;
+  model: string;
+  ifusa?: boolean | null;
+  yearfrom?: number | null;
+  yearTo?: number | null;
+  bodyType?: string | null;
+  fuel?: fuel | null;
+  transmission?: transmissionType | null;
+  driveType?: driveType | null;
+  mileageFrom?: number | null;
+  mileageTo?: number | null;
+  engineFrom: number | null;
+  engineTo: number | null;
 };
 
 // Allow arbitrary extras, but keep strong types for known keys.
-export type SearchFilters = Partial<SearchFilterMap> &
-  Record<string, string | number | RangeTuple | undefined>;
+export type SearchFilters = Partial<SearchFilterMap>;
 
 type SearchFilterKey = keyof SearchFilterMap;
 
 type Brand = keyof typeof CAR_DATA;
 
 export default function PriceYears() {
-  const [data, setData] = useState<YearPoint[] | null>(null);
-  const [data2, setData2] = useState<YearPoint[] | null>(null);
+  const [data, setData] = useState<Data | null>(null);
+  const [data2, setData2] = useState<Data | null>(null);
   const [filters, setFilters] = useState<SearchFilters>({});
   const [filters2, setFilters2] = useState<SearchFilters>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -134,6 +144,7 @@ export default function PriceYears() {
   const [isCompareMode, setIsCompareMode] = useState(false);
   const [excludeUSA, setExcludeUSA] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const dispatch = useAppDispatch();
 
   const currentYear = new Date().getFullYear();
   const years = Array.from(
@@ -141,42 +152,156 @@ export default function PriceYears() {
     (_, i) => currentYear - i,
   );
 
-  (useEffect(() => {
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const searchFilters: SearchFilters = {};
-    for (const [key, value] of urlParams.entries()) {
-      if (key === "mileageRange" || key === "engineVolume") {
-        searchFilters[key] = value.split(",").map(Number);
-      } else if (key === "excludeUSA") {
-        setExcludeUSA(value === "true");
-      } else {
-        searchFilters[key] = value;
+    let searchFilters: Partial<SearchFilters> = {};
+    const hasBrand = urlParams.has("brand");
+    const hasModel = urlParams.has("model");
+
+    if (!hasBrand || !hasModel) {
+      setIsLoading(false);
+      return;
+    }
+
+    const numberKeys = [
+      "yearfrom",
+      "yearTo",
+      "mileageFrom",
+      "mileageTo",
+      "engineFrom",
+      "engineTo",
+    ] as const;
+
+    const allowedKeys = new Set<keyof SearchFilters>([
+      "brand",
+      "model",
+      "bodyType",
+      "fuel",
+      "transmission",
+      "driveType",
+      ...numberKeys,
+    ]);
+
+    const isFilterKey = (k: string): k is keyof SearchFilters =>
+      allowedKeys.has(k as keyof SearchFilters);
+
+    type NumberKey = (typeof numberKeys)[number];
+    const isNumberKey = (k: keyof SearchFilters): k is NumberKey =>
+      (numberKeys as readonly string[]).includes(k as string);
+
+    function coerce<K extends keyof SearchFilters>(
+      k: K,
+      raw: string,
+    ): SearchFilters[K] {
+      if (k === "fuel")
+        return (raw === "All" ? null : (raw as fuel)) as SearchFilters[K];
+      if (k === "transmission")
+        return (
+          raw === "All" ? null : (raw as transmissionType)
+        ) as SearchFilters[K];
+      if (k === "driveType")
+        return (raw === "All" ? null : (raw as driveType)) as SearchFilters[K];
+      if (k === "bodyType")
+        return (raw === "All" ? null : raw) as SearchFilters[K];
+      if (k === "brand") return raw as Brand as SearchFilters[K];
+      if (isNumberKey(k)) return (raw ? Number(raw) : null) as SearchFilters[K];
+      // "model" and other strings
+      return (raw || null) as SearchFilters[K];
+    }
+
+    for (const [rawKey, rawValue] of urlParams.entries()) {
+      if (rawKey === "excludeUSA") {
+        setExcludeUSA(rawValue === "true");
+        continue;
+      }
+
+      if (isFilterKey(rawKey)) {
+        const k = rawKey as keyof SearchFilters;
+        // 2) Rebuild instead of mutate:
+        searchFilters = {
+          ...searchFilters,
+          [k]: coerce(k, rawValue),
+        } as SearchFilters; // one safe cast on the whole object
       }
     }
-    setFilters(searchFilters);
-    loadData(searchFilters, {}, isCompareMode);
-  }),
-    []);
 
-  const loadData = (
+    setFilters(searchFilters as SearchFilters);
+    loadData(searchFilters as SearchFilters, {});
+  }, []);
+
+  const loadData = async (
     searchFilters: SearchFilters,
     searchFilters2: SearchFilters,
-    isCompareMode: boolean,
   ) => {
     setIsLoading(true);
     setError("");
+
+    const data = await dispatch(
+      fetchPriceYears({
+        brand: searchFilters.brand!,
+        model: searchFilters.model!,
+        ifusa: excludeUSA ?? false,
+        yearfrom: searchFilters.yearfrom ?? null,
+        yearTo: searchFilters.yearTo ?? null,
+        bodyType: searchFilters.bodyType ?? null,
+        fuel:
+          searchFilters.fuel === "All" ? null : (searchFilters.fuel ?? null),
+        transmission:
+          searchFilters.transmission === "All"
+            ? null
+            : (searchFilters.transmission ?? null),
+        driveType:
+          searchFilters.driveType === "All"
+            ? null
+            : (searchFilters.driveType ?? null),
+        mileageFrom: searchFilters.mileageFrom ?? null,
+        mileageTo: searchFilters.mileageTo ?? null,
+        engineFrom: searchFilters.engineFrom ?? null,
+        engineTo: searchFilters.engineTo ?? null,
+      }),
+    ).unwrap();
+
+    if (
+      isCompareMode &&
+      searchFilters2 &&
+      searchFilters2.brand &&
+      searchFilters2.model
+    ) {
+      const data2 = await dispatch(
+        fetchPriceYears({
+          brand: searchFilters2.brand!,
+          model: searchFilters2.model!,
+          ifusa: excludeUSA ?? false,
+          yearfrom: searchFilters.yearfrom ?? null,
+          yearTo: searchFilters.yearTo ?? null,
+          bodyType: searchFilters.bodyType ?? null,
+          fuel:
+            searchFilters.fuel === "All" ? null : (searchFilters.fuel ?? null),
+          transmission:
+            searchFilters.transmission === "All"
+              ? null
+              : (searchFilters.transmission ?? null),
+          driveType:
+            searchFilters.driveType === "All"
+              ? null
+              : (searchFilters.driveType ?? null),
+          mileageFrom: searchFilters.mileageFrom ?? null,
+          mileageTo: searchFilters.mileageTo ?? null,
+          engineFrom: searchFilters.engineFrom ?? null,
+          engineTo: searchFilters.engineTo ?? null,
+        }),
+      ).unwrap();
+      const brand1 = searchFilters2.brand;
+      const model1 = searchFilters2.model;
+      setData2(data2.data[brand1][model1]);
+    }
 
     setTimeout(() => {
       // First car data
       const brand1 = searchFilters.brand;
       const model1 = searchFilters.model;
-      if (
-        brand1 &&
-        model1 &&
-        YEARLY_TEST_DATA[brand1] &&
-        YEARLY_TEST_DATA[brand1][model1]
-      ) {
-        setData(YEARLY_TEST_DATA[brand1][model1]);
+      if (brand1 && model1 && data.data[brand1] && data.data[brand1][model1]) {
+        setData(data.data[brand1][model1]);
       } else {
         setData(null);
         if (brand1 && model1) {
@@ -185,44 +310,16 @@ export default function PriceYears() {
       }
 
       // Second car data
-      if (
-        isCompareMode &&
-        searchFilters2 &&
-        searchFilters2.brand &&
-        searchFilters2.model
-      ) {
-        const brand2 = searchFilters2.brand;
-        const model2 = searchFilters2.model;
-        if (
-          brand2 &&
-          model2 &&
-          YEARLY_TEST_DATA[brand2] &&
-          YEARLY_TEST_DATA[brand2][model2]
-        ) {
-          setData2(YEARLY_TEST_DATA[brand2][model2]);
-        } else {
-          setData2(null);
-          if (brand2 && model2) {
-            setError((prev) =>
-              prev
-                ? prev + " " + "Дані для другого автомобіля відсутні."
-                : "Дані для другого автомобіля відсутні.",
-            );
-          }
-        }
-      } else {
-        setData2(null);
-      }
 
       setIsLoading(false);
     }, 800);
   };
 
   const validateYears = (currentFilters: SearchFilters) => {
-    const yearFrom = parseInt(currentFilters.yearFrom!);
-    const yearTo = parseInt(currentFilters.yearTo!);
+    const yearfrom = parseInt(String(currentFilters.yearfrom));
+    const yearTo = parseInt(String(currentFilters.yearTo));
 
-    if (yearFrom && yearTo && yearFrom > yearTo) {
+    if (yearfrom && yearTo && yearfrom > yearTo) {
       setError(
         'Неможливо почати пошук - значення "від" не можуть бути більшими за "до"',
       );
@@ -239,20 +336,16 @@ export default function PriceYears() {
     key: K,
     value: SearchFilterMap[K],
   ) => {
-    const newFilters = {
-      ...filters,
-      [key]: value,
-      ...(key === "brand" ? { model: "" } : {}),
-    };
-    setFilters(newFilters);
-
-    if (key === "yearFrom" || key === "yearTo") {
-      validateYears(newFilters);
-    } else {
-      if (error.includes("Неможливо почати пошук")) {
-        setError("");
-      }
-    }
+    setFilters((prev) => {
+      const next = {
+        ...prev,
+        [key]: value,
+        ...(key === "brand" ? { model: "" } : {}),
+      };
+      if (key === "yearfrom" || key === "yearTo") validateYears(next);
+      else if (error.includes("Неможливо почати пошук")) setError("");
+      return next;
+    });
   };
 
   const handleFilterChange2 = <K extends SearchFilterKey>(
@@ -283,7 +376,7 @@ export default function PriceYears() {
     if (!validateYears(filters)) {
       return;
     }
-    loadData(filters, isCompareMode ? filters2 : {}, isCompareMode);
+    loadData(filters, isCompareMode ? filters2 : {});
   };
 
   const resetAllFilters = () => {
@@ -300,37 +393,44 @@ export default function PriceYears() {
     const currentUrl = new URL(window.location.href.split("?")[0]);
     const params = new URLSearchParams();
 
-    // Add main filters
-    for (const key in filters) {
-      if (
-        filters[key] !== null &&
-        filters[key] !== undefined &&
-        filters[key] !== ""
-      ) {
-        if (Array.isArray(filters[key])) {
-          params.append(key, filters[key].join(","));
-        } else {
-          params.append(key, String(filters[key]));
-        }
-      }
+    if (filters.mileageFrom != null && filters.mileageTo != null) {
+      params.set("mileageRange", `${filters.mileageFrom},${filters.mileageTo}`);
+    }
+    if (filters.engineFrom != null && filters.engineTo != null) {
+      params.set("engineVolume", `${filters.engineFrom},${filters.engineTo}`);
     }
 
-    // Add compare filters if in compare mode
-    if (isCompareMode) {
-      for (const key in filters2) {
-        if (
-          filters2[key] !== null &&
-          filters2[key] !== undefined &&
-          filters2[key] !== ""
-        ) {
-          if (Array.isArray(filters2[key])) {
-            params.append(key, filters2[key].join(","));
-          } else {
-            params.append(key, String(filters2[key]));
-          }
-        }
-      }
-    }
+    // Add main filters
+    // for (const key in filters) {
+    //   if (
+    //     filters[key] !== null &&
+    //     filters[key] !== undefined &&
+    //     filters[key] !== ""
+    //   ) {
+    //     if (Array.isArray(filters[key])) {
+    //       params.append(key, filters[key].join(","));
+    //     } else {
+    //       params.append(key, String(filters[key]));
+    //     }
+    //   }
+    // }
+
+    // // Add compare filters if in compare mode
+    // if (isCompareMode) {
+    //   for (const key in filters2) {
+    //     if (
+    //       filters2[key] !== null &&
+    //       filters2[key] !== undefined &&
+    //       filters2[key] !== ""
+    //     ) {
+    //       if (Array.isArray(filters2[key])) {
+    //         params.append(key, filters2[key].join(","));
+    //       } else {
+    //         params.append(key, String(filters2[key]));
+    //       }
+    //     }
+    //   }
+    // }
 
     // Add excludeUSA
     if (excludeUSA) {
@@ -342,6 +442,31 @@ export default function PriceYears() {
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2500);
   };
+
+  const [mileageDraft, setMileageDraft] = useState<RangeTuple>([
+    filters.mileageFrom ?? 0,
+    filters.mileageTo ?? 200000,
+  ]);
+  useEffect(() => {
+    setMileageDraft([filters.mileageFrom ?? 0, filters.mileageTo ?? 200000]);
+  }, [filters.mileageFrom, filters.mileageTo]);
+
+  const [engineDraft, setEngineDraft] = useState<RangeTuple>([
+    filters.engineFrom ?? 1,
+    filters.engineTo ?? 4,
+  ]);
+  useEffect(() => {
+    setEngineDraft([filters.engineFrom ?? 1, filters.engineTo ?? 4]);
+  }, [filters.engineFrom, filters.engineTo]);
+
+  const commitRange =
+    (fromKey: "mileageFrom" | "engineFrom", toKey: "mileageTo" | "engineTo") =>
+    ([min, max]: RangeTuple) =>
+      setFilters((p) =>
+        p[fromKey] === min && p[toKey] === max
+          ? p
+          : { ...p, [fromKey]: min, [toKey]: max },
+      );
 
   if (isLoading) {
     return (
@@ -437,7 +562,7 @@ export default function PriceYears() {
                       handleFilterChange("brand", value)
                     }
                   >
-                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20">
+                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full">
                       <SelectValue placeholder="Оберіть марку" />
                     </SelectTrigger>
                     <SelectContent>
@@ -460,7 +585,7 @@ export default function PriceYears() {
                     }
                     disabled={!filters.brand}
                   >
-                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20">
+                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full">
                       <SelectValue placeholder="Оберіть модель" />
                     </SelectTrigger>
                     <SelectContent>
@@ -478,13 +603,13 @@ export default function PriceYears() {
                 <div className="space-y-2">
                   <Label className="text-slate-700 font-medium">Рік від</Label>
                   <Select
-                    value={filters.yearFrom || ""}
+                    value={String(filters.yearfrom) || ""}
                     onValueChange={(value) =>
-                      handleFilterChange("yearFrom", value)
+                      handleFilterChange("yearfrom", Number(value))
                     }
                   >
                     <SelectTrigger
-                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""}`}
+                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""} w-full`}
                     >
                       <SelectValue placeholder="Від року" />
                     </SelectTrigger>
@@ -502,13 +627,13 @@ export default function PriceYears() {
                 <div className="space-y-2">
                   <Label className="text-slate-700 font-medium">Рік до</Label>
                   <Select
-                    value={filters.yearTo || ""}
+                    value={String(filters.yearTo) || ""}
                     onValueChange={(value) =>
-                      handleFilterChange("yearTo", value)
+                      handleFilterChange("yearTo", Number(value))
                     }
                   >
                     <SelectTrigger
-                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""}`}
+                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""} w-full`}
                     >
                       <SelectValue placeholder="До року" />
                     </SelectTrigger>
@@ -677,20 +802,20 @@ export default function PriceYears() {
                         Тип пального
                       </Label>
                       <Select
-                        value={filters.engineType || ""}
-                        onValueChange={(value: engineType) =>
-                          handleFilterChange("engineType", value)
+                        value={filters.fuel || ""}
+                        onValueChange={(value: fuel) =>
+                          handleFilterChange("fuel", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500">
+                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
                           <SelectValue placeholder="Оберіть тип" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Всі типи</SelectItem>
-                          <SelectItem value="бензин">Бензин</SelectItem>
-                          <SelectItem value="дизель">Дизель</SelectItem>
-                          <SelectItem value="гібрид">Гібрид</SelectItem>
-                          <SelectItem value="електро">Електро</SelectItem>
+                          <SelectItem value="All">Всі типи</SelectItem>
+                          <SelectItem value="Бензин">Бензин</SelectItem>
+                          <SelectItem value="Дизель">Дизель</SelectItem>
+                          <SelectItem value="Гібрид">Гібрид</SelectItem>
+                          <SelectItem value="Електро">Електро</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -706,18 +831,18 @@ export default function PriceYears() {
                           handleFilterChange("transmission", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500">
+                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
                           <SelectValue placeholder="Оберіть тип" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Всі типи</SelectItem>
-                          <SelectItem value="механіка">Механіка</SelectItem>
-                          <SelectItem value="автомат_всі">
-                            Автомат (всі типи)
+                          <SelectItem value="All">Всі типи</SelectItem>
+                          <SelectItem value="Ручна / Механіка">
+                            Ручна / Механіка
                           </SelectItem>
-                          <SelectItem value="автомат">Автомат</SelectItem>
-                          <SelectItem value="робот">Робот</SelectItem>
-                          <SelectItem value="варіатор">Варіатор</SelectItem>
+                          <SelectItem value="Типтронік">Типтронік</SelectItem>
+                          <SelectItem value="Автомат">Автомат</SelectItem>
+                          <SelectItem value="Робот">Робот</SelectItem>
+                          <SelectItem value="Варіатор">Варіатор</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -733,14 +858,16 @@ export default function PriceYears() {
                           handleFilterChange("driveType", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500">
+                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
                           <SelectValue placeholder="Оберіть тип" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Всі типи</SelectItem>
-                          <SelectItem value="fwd">Передній (FWD)</SelectItem>
-                          <SelectItem value="rwd">Задній (RWD)</SelectItem>
-                          <SelectItem value="awd">Повний (AWD)</SelectItem>
+                          <SelectItem value="All">Всі типи</SelectItem>
+                          <SelectItem value="Передній">
+                            Передній (FWD)
+                          </SelectItem>
+                          <SelectItem value="Задній">Задній (RWD)</SelectItem>
+                          <SelectItem value="Повний">Повний (AWD)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -754,9 +881,14 @@ export default function PriceYears() {
                         min={0}
                         max={500000}
                         step={5000}
-                        value={filters.mileageRange || [0, 200000]}
-                        onChange={(value: RangeTuple) =>
-                          handleFilterChange("mileageRange", value)
+                        value={mileageDraft}
+                        onChange={setMileageDraft}
+                        onCommit={([min, max]: [number, number]) =>
+                          setFilters((p) => ({
+                            ...p,
+                            mileageFrom: min,
+                            mileageTo: max,
+                          }))
                         }
                         unit="км"
                       />
@@ -769,9 +901,14 @@ export default function PriceYears() {
                         min={1.0}
                         max={6.0}
                         step={0.1}
-                        value={filters.engineVolume || [1.0, 4.0]}
-                        onChange={(value: RangeTuple) =>
-                          handleFilterChange("engineVolume", value)
+                        value={engineDraft}
+                        onChange={setEngineDraft}
+                        onCommit={([min, max]: [number, number]) =>
+                          setFilters((p) => ({
+                            ...p,
+                            engineFrom: min,
+                            engineTo: max,
+                          }))
                         }
                         unit="л"
                       />
@@ -821,7 +958,14 @@ export default function PriceYears() {
               transition={{ delay: 0.3 }}
               className="mb-8"
             >
-              <YearlyMetricsCards data={data} data2={data2} />
+              <YearlyMetricsCards
+                averagePriceFrom1={data.averagePriceFrom}
+                averagePriceTo1={data.averagePriceTo}
+                quantity1={data.quantity}
+                averagePriceFrom2={data2?.averagePriceFrom}
+                averagePriceTo2={data2?.averagePriceTo}
+                quantity2={data2?.quantity}
+              />
             </motion.div>
 
             <motion.div
@@ -831,8 +975,8 @@ export default function PriceYears() {
               className="mb-8"
             >
               <YearlyPriceChart
-                data={data}
-                data2={data2}
+                data={data.years}
+                data2={data2?.years}
                 filters={filters}
                 filters2={filters2}
               />

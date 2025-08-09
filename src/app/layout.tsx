@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import "./globals.css";
 import Link from "next/link";
+import StoreProvider from "./StoreProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -63,7 +64,7 @@ export default function RootLayout({
           <header className="bg-white/80 backdrop-blur-lg border-b border-blue-100/50 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
-                <Link href="Home" className="flex items-center space-x-3 group">
+                <Link href="/" className="flex items-center space-x-3 group">
                   <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                     <Car className="w-6 h-6 text-white" />
                   </div>
@@ -94,7 +95,9 @@ export default function RootLayout({
           </header>
 
           {/* Main Content */}
-          <main className="flex-1">{children}</main>
+          <StoreProvider>
+            <main className="flex-1">{children}</main>
+          </StoreProvider>
 
           {/* Footer */}
           <footer className="bg-white/70 backdrop-blur-sm border-t border-slate-200/50 mt-16">

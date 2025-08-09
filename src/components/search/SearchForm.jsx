@@ -12,6 +12,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Search, Star, Car, Calendar, AlertCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const CAR_DATA = {
   Audi: ["A4", "A6", "Q5", "Q7", "A3"],
@@ -41,10 +42,11 @@ const CAR_DATA = {
 };
 
 export default function SearchForm({ onSearch }) {
+  const router = useRouter();
   const [filters, setFilters] = useState({
     brand: "",
     model: "",
-    yearFrom: "",
+    yearfrom: "",
     yearTo: "",
   });
   const [error, setError] = useState("");
@@ -65,7 +67,7 @@ export default function SearchForm({ onSearch }) {
     setFilters(newFilters);
 
     // Валідація діапазону років
-    if (key === "yearFrom" || key === "yearTo") {
+    if (key === "yearfrom" || key === "yearTo") {
       validateYears(newFilters);
     } else {
       setError("");
@@ -73,10 +75,10 @@ export default function SearchForm({ onSearch }) {
   };
 
   const validateYears = (currentFilters) => {
-    const yearFrom = parseInt(currentFilters.yearFrom);
+    const yearfrom = parseInt(currentFilters.yearfrom);
     const yearTo = parseInt(currentFilters.yearTo);
 
-    if (yearFrom && yearTo && yearFrom > yearTo) {
+    if (yearfrom && yearTo && yearfrom > yearTo) {
       setError(
         'Неможливо почати пошук - значення "від" не можуть бути більшими за "до"',
       );
@@ -91,10 +93,10 @@ export default function SearchForm({ onSearch }) {
     }
 
     // Перевірка валідності років перед переходом
-    const yearFrom = parseInt(filters.yearFrom);
+    const yearfrom = parseInt(filters.yearfrom);
     const yearTo = parseInt(filters.yearTo);
 
-    if (yearFrom && yearTo && yearFrom > yearTo) {
+    if (yearfrom && yearTo && yearfrom > yearTo) {
       setError(
         'Неможливо почати пошук - значення "від" не можуть бути більшими за "до"',
       );
@@ -102,7 +104,7 @@ export default function SearchForm({ onSearch }) {
     }
 
     const params = new URLSearchParams(filters).toString();
-    navigate(`${createPageUrl("PriceAnalysis")}?${params}`);
+    router.push(`/PriceAnalysis?${params.toString()}`);
   };
 
   const isFormValid = filters.brand && filters.model && !error;
@@ -141,7 +143,7 @@ export default function SearchForm({ onSearch }) {
                 value={filters.brand}
                 onValueChange={(value) => handleFilterChange("brand", value)}
               >
-                <SelectTrigger className="h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20">
+                <SelectTrigger className="h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 w-full">
                   <SelectValue placeholder="Оберіть марку" />
                 </SelectTrigger>
                 <SelectContent>
@@ -165,7 +167,7 @@ export default function SearchForm({ onSearch }) {
                 onValueChange={(value) => handleFilterChange("model", value)}
                 disabled={!filters.brand}
               >
-                <SelectTrigger className="h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20">
+                <SelectTrigger className="h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 w-full">
                   <SelectValue placeholder="Оберіть модель" />
                 </SelectTrigger>
                 <SelectContent>
@@ -186,11 +188,11 @@ export default function SearchForm({ onSearch }) {
                 Рік від
               </Label>
               <Select
-                value={filters.yearFrom}
-                onValueChange={(value) => handleFilterChange("yearFrom", value)}
+                value={filters.yearfrom}
+                onValueChange={(value) => handleFilterChange("yearfrom", value)}
               >
                 <SelectTrigger
-                  className={`h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 ${error ? "border-red-300" : ""}`}
+                  className={`h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 ${error ? "border-red-300" : ""} w-full`}
                 >
                   <SelectValue placeholder="Від року" />
                 </SelectTrigger>
@@ -215,7 +217,7 @@ export default function SearchForm({ onSearch }) {
                 onValueChange={(value) => handleFilterChange("yearTo", value)}
               >
                 <SelectTrigger
-                  className={`h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 ${error ? "border-red-300" : ""}`}
+                  className={`h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 ${error ? "border-red-300" : ""} w-full`}
                 >
                   <SelectValue placeholder="До року" />
                 </SelectTrigger>

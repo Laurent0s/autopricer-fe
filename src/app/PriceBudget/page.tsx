@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { DollarSign, Search, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,11 +17,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Input } from "@/components/ui/input"; // Added Input component
+import { Input } from "@/components/ui/input";
 import BodyTypeSelector from "@/components/search/BodyTypeSelector";
 import RangeSlider from "@/components/search/RangeSlider";
 import FilterSidebar from "@/components/budget/FilterSidebar";
 import ResultList from "@/components/budget/ResultList";
+import { useAppDispatch } from "@/store/hooks";
+import { fetchBudget, PriceBudgetsCar } from "@/store/slices/PriceBudgetSlice";
 
 const CAR_DATA = {
   Audi: ["A4", "A6", "Q5", "Q7", "A3"],
@@ -148,34 +150,38 @@ type transmissionType =
 type driveType = "fwd" | "rwd" | "awd" | "";
 
 type SearchFilterMap = {
-  budget?: number;
-  brand?: keyof typeof CAR_DATA;
-  model?: string;
-  yearFrom?: string;
-  yearTo?: string;
-  bodyType?: string;
-  engineType?: engineType;
-  transmission?: transmissionType;
-  driveType?: driveType;
-  mileageRange?: RangeTuple;
-  engineVolume?: RangeTuple;
+  price: number;
+  page: number;
+  limit: number;
+  brand: keyof typeof CAR_DATA | null;
+  model: string;
+  ifusa: boolean;
+  yearfrom: number | null;
+  yearTo: number | null;
+  bodyType: string | null;
+  fuel: string | null;
+  transmission: string | null;
+  driveType: string | null;
+  mileageFrom: number | null;
+  mileageTo: number | null;
+  engineFrom: number | null;
+  engineTo: number | null;
 };
 
-export type SearchFilters = Partial<SearchFilterMap> &
-  Record<string, string | number | RangeTuple | undefined>;
+export type SearchFilters = Partial<SearchFilterMap>;
 
 type SearchFilterKey = keyof SearchFilterMap;
 
 export default function BudgetFinderPage() {
-  const [filters, setFilters] = useState<SearchFilterMap>({
-    budget: 15000,
-    yearFrom: "2015",
-    yearTo: "",
-  });
+  const [filters, setFilters] = useState<SearchFilters>();
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [excludeUSA, setExcludeUSA] = useState(false);
-  const [results, setResults] = useState<MockResult[]>([]);
+  const [results, setResults] = useState<PriceBudgetsCar[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [page, setPage] = useState<number>(1);
+  const [totalOffers, setTotalOffers] = useState<number>(0);
+  const [limit, setLimit] = useState<number>(10);
+  const dispatch = useAppDispatch();
 
   const currentYear = new Date().getFullYear();
   const years = Array.from(
@@ -190,12 +196,72 @@ export default function BudgetFinderPage() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     setIsSearching(true);
-    setTimeout(() => {
-      setResults(MOCK_RESULTS);
-      setIsSearching(false);
-    }, 1000);
+    const data = await dispatch(
+      fetchBudget({
+        price: filters?.price ?? 0,
+        page: page,
+        limit: limit,
+        brand: filters?.brand ?? null,
+        model: filters?.model ?? null,
+        ifusa: excludeUSA,
+        yearfrom: filters?.yearfrom ?? null,
+        yearTo: filters?.yearTo ?? null,
+        bodyType: filters?.bodyType ?? null,
+        fuel: filters?.fuel ?? null,
+        transmission: filters?.transmission ?? null,
+        driveType: filters?.driveType ?? null,
+        mileageFrom: filters?.mileageFrom ?? null,
+        mileageTo: filters?.mileageTo ?? null,
+        engineFrom: filters?.engineFrom ?? null,
+        engineTo: filters?.engineTo ?? null,
+      }),
+    ).unwrap();
+    setResults(data.data);
+    setTotalOffers(Number(data.totalOffers));
+    setIsSearching(false);
+  };
+
+  useEffect(() => {
+    handleSearch();
+  }, [page]);
+
+  const [mileageDraft, setMileageDraft] = useState<RangeTuple>([
+    filters?.mileageFrom ?? 0,
+    filters?.mileageTo ?? 200000,
+  ]);
+  useEffect(() => {
+    setMileageDraft([filters?.mileageFrom ?? 0, filters?.mileageTo ?? 200000]);
+  }, [filters?.mileageFrom, filters?.mileageTo]);
+
+  const [engineDraft, setEngineDraft] = useState<RangeTuple>([
+    filters?.engineFrom ?? 1,
+    filters?.engineTo ?? 4,
+  ]);
+  useEffect(() => {
+    setEngineDraft([filters?.engineFrom ?? 1, filters?.engineTo ?? 4]);
+  }, [filters?.engineFrom, filters?.engineTo]);
+
+  const commitRange =
+    (fromKey: "mileageFrom" | "engineFrom", toKey: "mileageTo" | "engineTo") =>
+    ([min, max]: RangeTuple) =>
+      setFilters((p) =>
+        p![fromKey] === min && p![toKey] === max
+          ? p
+          : { ...p, [fromKey]: min, [toKey]: max },
+      );
+
+  const handleNext = () => {
+    setPage((p) => p + 1);
+  };
+
+  const handlePrevious = () => {
+    setPage((p) => Math.max(1, p - 1));
+  };
+
+  const handleSpecific = (page: number) => {
+    setPage(page);
   };
 
   return (
@@ -244,12 +310,13 @@ export default function BudgetFinderPage() {
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                   <Input
+                    suppressHydrationWarning
                     id="budget-input"
                     type="number"
                     placeholder="Наприклад, 15000"
-                    value={filters.budget || ""}
+                    value={filters?.price || ""}
                     onChange={(e) =>
-                      handleFilterChange("budget", Number(e.target.value))
+                      handleFilterChange("price", Number(e.target.value))
                     }
                     className="h-12 pl-10 text-lg border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20"
                     step="500"
@@ -257,18 +324,21 @@ export default function BudgetFinderPage() {
                 </div>
               </div>
               {/* Рік від */}
-              <div className="space-y-2">
+              <div className="space-y-2 h-full">
                 <Label className="text-slate-700 font-medium">Рік від</Label>
                 <Select
-                  value={filters.yearFrom}
+                  value={filters?.yearfrom ? String(filters.yearfrom) : ""}
                   onValueChange={(value) =>
-                    handleFilterChange("yearFrom", value)
+                    handleFilterChange("yearfrom", Number(value))
                   }
                 >
-                  <SelectTrigger className="h-12 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20">
+                  <SelectTrigger
+                    suppressHydrationWarning
+                    className=" border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20 w-full"
+                  >
                     <SelectValue placeholder="Від року" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent suppressHydrationWarning>
                     {years.map((year) => (
                       <SelectItem key={year} value={year.toString()}>
                         {year}
@@ -281,13 +351,18 @@ export default function BudgetFinderPage() {
               <div className="space-y-2">
                 <Label className="text-slate-700 font-medium">Рік до</Label>
                 <Select
-                  value={filters.yearTo}
-                  onValueChange={(value) => handleFilterChange("yearTo", value)}
+                  value={filters?.yearTo ? String(filters?.yearTo) : ""}
+                  onValueChange={(value) =>
+                    handleFilterChange("yearTo", Number(value))
+                  }
                 >
-                  <SelectTrigger className="h-12 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20">
+                  <SelectTrigger
+                    suppressHydrationWarning
+                    className="h-12 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20 w-full"
+                  >
                     <SelectValue placeholder="До року" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent suppressHydrationWarning>
                     {years.map((year) => (
                       <SelectItem key={year} value={year.toString()}>
                         {year}
@@ -303,6 +378,7 @@ export default function BudgetFinderPage() {
               <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
                 <CollapsibleTrigger asChild>
                   <Button
+                    suppressHydrationWarning
                     variant="ghost"
                     className="text-slate-700 hover:bg-white/50 p-2 h-auto text-sm font-medium"
                   >
@@ -332,7 +408,11 @@ export default function BudgetFinderPage() {
                 </div>
                 {!showAdvanced && (
                   <Button
-                    onClick={handleSearch}
+                    suppressHydrationWarning
+                    onClick={() => {
+                      setPage(1);
+                      handleSearch();
+                    }}
                     className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     <Search className="w-4 h-4 mr-2" />
@@ -357,7 +437,7 @@ export default function BudgetFinderPage() {
                     Тип кузова
                   </Label>
                   <BodyTypeSelector
-                    selected={filters.bodyType}
+                    selected={filters?.bodyType}
                     onSelect={(value: string) =>
                       handleFilterChange("bodyType", value)
                     }
@@ -371,20 +451,23 @@ export default function BudgetFinderPage() {
                       Тип пального
                     </Label>
                     <Select
-                      value={filters.engineType || ""}
+                      value={filters?.fuel || ""}
                       onValueChange={(value: engineType) =>
-                        handleFilterChange("engineType", value)
+                        handleFilterChange("fuel", value)
                       }
                     >
-                      <SelectTrigger className="h-11 border-slate-300 focus:border-emerald-500">
+                      <SelectTrigger
+                        suppressHydrationWarning
+                        className="h-11 border-slate-300 focus:border-emerald-500 w-full"
+                      >
                         <SelectValue placeholder="Оберіть тип" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Всі типи</SelectItem>
-                        <SelectItem value="бензин">Бензин</SelectItem>
-                        <SelectItem value="дизель">Дизель</SelectItem>
-                        <SelectItem value="гібрид">Гібрид</SelectItem>
-                        <SelectItem value="електро">Електро</SelectItem>
+                      <SelectContent suppressHydrationWarning>
+                        <SelectItem value="All">Всі типи</SelectItem>
+                        <SelectItem value="Бензин">Бензин</SelectItem>
+                        <SelectItem value="Дизель">Дизель</SelectItem>
+                        <SelectItem value="Гібрид">Гібрид</SelectItem>
+                        <SelectItem value="Електро">Електро</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -395,23 +478,26 @@ export default function BudgetFinderPage() {
                       Тип трансмісії
                     </Label>
                     <Select
-                      value={filters.transmission || ""}
+                      value={filters?.transmission || ""}
                       onValueChange={(value: transmissionType) =>
                         handleFilterChange("transmission", value)
                       }
                     >
-                      <SelectTrigger className="h-11 border-slate-300 focus:border-emerald-500">
+                      <SelectTrigger
+                        suppressHydrationWarning
+                        className="h-11 border-slate-300 focus:border-emerald-500 w-full"
+                      >
                         <SelectValue placeholder="Оберіть тип" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Всі типи</SelectItem>
-                        <SelectItem value="механіка">Механіка</SelectItem>
-                        <SelectItem value="автомат_всі">
-                          Автомат (всі типи)
+                      <SelectContent suppressHydrationWarning>
+                        <SelectItem value="All">Всі типи</SelectItem>
+                        <SelectItem value="Ручна / Механіка">
+                          Ручна / Механіка
                         </SelectItem>
-                        <SelectItem value="автомат">Автомат</SelectItem>
-                        <SelectItem value="робот">Робот</SelectItem>
-                        <SelectItem value="варіатор">Варіатор</SelectItem>
+                        <SelectItem value="Типтронік">Типтронік</SelectItem>
+                        <SelectItem value="Автомат">Автомат</SelectItem>
+                        <SelectItem value="Робот">Робот</SelectItem>
+                        <SelectItem value="Варіатор">Варіатор</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -422,19 +508,22 @@ export default function BudgetFinderPage() {
                       Тип приводу
                     </Label>
                     <Select
-                      value={filters.driveType || ""}
+                      value={filters?.driveType || ""}
                       onValueChange={(value: driveType) =>
                         handleFilterChange("driveType", value)
                       }
                     >
-                      <SelectTrigger className="h-11 border-slate-300 focus:border-emerald-500">
+                      <SelectTrigger
+                        suppressHydrationWarning
+                        className="h-11 border-slate-300 focus:border-emerald-500 w-full"
+                      >
                         <SelectValue placeholder="Оберіть тип" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Всі типи</SelectItem>
-                        <SelectItem value="fwd">Передній (FWD)</SelectItem>
-                        <SelectItem value="rwd">Задній (RWD)</SelectItem>
-                        <SelectItem value="awd">Повний (AWD)</SelectItem>
+                      <SelectContent suppressHydrationWarning>
+                        <SelectItem value="All">Всі типи</SelectItem>
+                        <SelectItem value="Передній">Передній (FWD)</SelectItem>
+                        <SelectItem value="Задній">Задній (RWD)</SelectItem>
+                        <SelectItem value="Повний">Повний (AWD)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -448,9 +537,14 @@ export default function BudgetFinderPage() {
                       min={0}
                       max={500000}
                       step={5000}
-                      value={filters.mileageRange || [0, 200000]}
-                      onChange={(value: RangeTuple) =>
-                        handleFilterChange("mileageRange", value)
+                      value={mileageDraft}
+                      onChange={setMileageDraft}
+                      onCommit={([min, max]: [number, number]) =>
+                        setFilters((p) => ({
+                          ...p,
+                          mileageFrom: min,
+                          mileageTo: max,
+                        }))
                       }
                       unit="км"
                     />
@@ -463,9 +557,14 @@ export default function BudgetFinderPage() {
                       min={1.0}
                       max={6.0}
                       step={0.1}
-                      value={filters.engineVolume || [1.0, 4.0]}
-                      onChange={(value: RangeTuple) =>
-                        handleFilterChange("engineVolume", value)
+                      value={engineDraft}
+                      onChange={setEngineDraft}
+                      onCommit={([min, max]: [number, number]) =>
+                        setFilters((p) => ({
+                          ...p,
+                          engineFrom: min,
+                          engineTo: max,
+                        }))
                       }
                       unit="л"
                     />
@@ -475,7 +574,11 @@ export default function BudgetFinderPage() {
                 {/* Search button at bottom of advanced filters */}
                 <div className="flex justify-center">
                   <Button
-                    onClick={handleSearch}
+                    suppressHydrationWarning
+                    onClick={() => {
+                      setPage(1);
+                      handleSearch();
+                    }}
                     className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     <Search className="w-4 h-4 mr-2" />
@@ -501,7 +604,15 @@ export default function BudgetFinderPage() {
               <FilterSidebar />
             </div>
             <div className="lg:col-span-3">
-              <ResultList results={results} />
+              <ResultList
+                results={results}
+                handleNext={handleNext}
+                handlePrevious={handlePrevious}
+                handleSpecific={handleSpecific}
+                page={page}
+                pagemax={Math.ceil(totalOffers / limit)}
+                totalOffers={totalOffers}
+              />
             </div>
           </motion.div>
         )}
