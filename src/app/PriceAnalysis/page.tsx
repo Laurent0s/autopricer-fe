@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -121,7 +121,12 @@ export default function PriceAnalysisPage() {
     (_, i) => currentYear - i,
   );
 
+  const didInit = useRef(false);
+
   useEffect(() => {
+    if (didInit.current) return;
+    didInit.current = true;
+
     const urlParams = new URLSearchParams(window.location.search);
     let searchFilters: SearchFilters = {};
     const hasBrand = urlParams.has("brand");
@@ -291,7 +296,7 @@ export default function PriceAnalysisPage() {
         setIsLoading(false);
       }, 800);
     },
-    [],
+    [dispatch, excludeUSA, isCompareMode],
   );
 
   const validateYears = (currentFilters: SearchFilters) => {
