@@ -45,7 +45,7 @@ export const fetchPriceAnalysis = createAsyncThunk<
   async (payload: PriceAnalysisRequest, { rejectWithValue }) => {
     try {
       const { data } = await api.post<PriceAnalysisResponse>(
-        "/api/price-analyze",
+        "/price-analyze",
         payload,
         { headers: { "Content-Type": "application/json" } },
       );
