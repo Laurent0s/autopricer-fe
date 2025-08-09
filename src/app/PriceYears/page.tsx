@@ -71,10 +71,6 @@ type Data = {
   years: YearPoint[];
 };
 type YearPoint = { year: number; avg_price: number; listings: number };
-type ModelOf<B extends Brand> = (typeof CAR_DATA)[B][number];
-type YearlyData = {
-  [B in Brand]?: Partial<Record<ModelOf<B>, YearPoint[]>>;
-};
 
 type RangeTuple = number[];
 type fuel = "бензин" | "дизель" | "гібрид" | "електро" | "All";

@@ -55,22 +55,6 @@ const CAR_DATA = {
 
 void CAR_DATA;
 
-interface MockResult {
-  id: number;
-  brand: string;
-  model: string;
-  generation: string;
-  years: string;
-  avgPrice: number;
-  medianPrice: number;
-  listings: number;
-  engine: string;
-  transmission: string;
-  fuel: string;
-  drive: string;
-  imageUrl: string;
-}
-
 type RangeTuple = number[];
 type engineType = "бензин" | "дизель" | "гібрид" | "електро" | "";
 type transmissionType =
@@ -131,6 +115,7 @@ export default function BudgetFinderPage() {
 
   const handleSearch = async () => {
     setIsSearching(true);
+    setLimit(10);
     const data = await dispatch(
       fetchBudget({
         price: filters?.price ?? 0,
