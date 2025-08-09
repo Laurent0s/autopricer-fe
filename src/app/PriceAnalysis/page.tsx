@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -201,45 +201,12 @@ export default function PriceAnalysisPage() {
     loadData(searchFilters, {} as SearchFilters);
   }, []);
 
-  const loadData = async (
-    searchFilters: SearchFilters,
-    searchFilters2: SearchFilters,
-  ) => {
-    const data = await dispatch(
-      fetchPriceAnalysis({
-        brand: searchFilters.brand!,
-        model: searchFilters.model!,
-        ifusa: excludeUSA ?? false,
-        yearfrom: searchFilters.yearfrom ?? null,
-        yearTo: searchFilters.yearTo ?? null,
-        bodyType: searchFilters.bodyType ?? null,
-        fuel:
-          searchFilters.fuel === "All" ? null : (searchFilters.fuel ?? null),
-        transmission:
-          searchFilters.transmission === "All"
-            ? null
-            : (searchFilters.transmission ?? null),
-        driveType:
-          searchFilters.driveType === "All"
-            ? null
-            : (searchFilters.driveType ?? null),
-        mileageFrom: searchFilters.mileageFrom ?? null,
-        mileageTo: searchFilters.mileageTo ?? null,
-        engineFrom: searchFilters.engineFrom ?? null,
-        engineTo: searchFilters.engineTo ?? null,
-      }),
-    ).unwrap();
-
-    if (
-      isCompareMode &&
-      searchFilters2 &&
-      searchFilters2.brand &&
-      searchFilters2.model
-    ) {
-      const data2 = await dispatch(
+  const loadData = useCallback(
+    async (searchFilters: SearchFilters, searchFilters2: SearchFilters) => {
+      const data = await dispatch(
         fetchPriceAnalysis({
-          brand: searchFilters2.brand!,
-          model: searchFilters2.model!,
+          brand: searchFilters.brand!,
+          model: searchFilters.model!,
           ifusa: excludeUSA ?? false,
           yearfrom: searchFilters.yearfrom ?? null,
           yearTo: searchFilters.yearTo ?? null,
@@ -260,32 +227,72 @@ export default function PriceAnalysisPage() {
           engineTo: searchFilters.engineTo ?? null,
         }),
       ).unwrap();
-      const brand1 = searchFilters2.brand;
-      const model1 = searchFilters2.model;
-      setData2(data2.data[brand1][model1]);
-    }
 
-    setIsLoading(true);
-    setError("");
-
-    setTimeout(() => {
-      // First car data
-      const brand1 = searchFilters.brand;
-      const model1 = searchFilters.model;
-      if (brand1 && model1 && data.data[brand1] && data.data[brand1][model1]) {
-        setData(data.data[brand1][model1]);
-      } else {
-        setData(null); // Set to null if specific car not found in TEST_DATA
-        // Only set error if brand and model are actually selected but data is missing
-        if (brand1 && model1) {
-          setError(
-            "Дані для обраної марки та моделі відсутні. Спробуйте іншу комбінацію.",
-          );
-        }
+      if (
+        isCompareMode &&
+        searchFilters2 &&
+        searchFilters2.brand &&
+        searchFilters2.model
+      ) {
+        const data2 = await dispatch(
+          fetchPriceAnalysis({
+            brand: searchFilters2.brand!,
+            model: searchFilters2.model!,
+            ifusa: excludeUSA ?? false,
+            yearfrom: searchFilters.yearfrom ?? null,
+            yearTo: searchFilters.yearTo ?? null,
+            bodyType: searchFilters.bodyType ?? null,
+            fuel:
+              searchFilters.fuel === "All"
+                ? null
+                : (searchFilters.fuel ?? null),
+            transmission:
+              searchFilters.transmission === "All"
+                ? null
+                : (searchFilters.transmission ?? null),
+            driveType:
+              searchFilters.driveType === "All"
+                ? null
+                : (searchFilters.driveType ?? null),
+            mileageFrom: searchFilters.mileageFrom ?? null,
+            mileageTo: searchFilters.mileageTo ?? null,
+            engineFrom: searchFilters.engineFrom ?? null,
+            engineTo: searchFilters.engineTo ?? null,
+          }),
+        ).unwrap();
+        const brand1 = searchFilters2.brand;
+        const model1 = searchFilters2.model;
+        setData2(data2.data[brand1][model1]);
       }
-      setIsLoading(false);
-    }, 800);
-  };
+
+      setIsLoading(true);
+      setError("");
+
+      setTimeout(() => {
+        // First car data
+        const brand1 = searchFilters.brand;
+        const model1 = searchFilters.model;
+        if (
+          brand1 &&
+          model1 &&
+          data.data[brand1] &&
+          data.data[brand1][model1]
+        ) {
+          setData(data.data[brand1][model1]);
+        } else {
+          setData(null); // Set to null if specific car not found in TEST_DATA
+          // Only set error if brand and model are actually selected but data is missing
+          if (brand1 && model1) {
+            setError(
+              "Дані для обраної марки та моделі відсутні. Спробуйте іншу комбінацію.",
+            );
+          }
+        }
+        setIsLoading(false);
+      }, 800);
+    },
+    [],
+  );
 
   const validateYears = (currentFilters: SearchFilters) => {
     const yearfrom = parseInt(String(currentFilters.yearfrom));
