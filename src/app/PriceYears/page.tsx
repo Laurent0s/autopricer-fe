@@ -215,7 +215,7 @@ export default function PriceYears() {
         setIsLoading(false);
       }, 800);
     },
-    [dispatch],
+    [dispatch, excludeUSA, isCompareMode],
   );
 
   const didInit = useRef(false);
