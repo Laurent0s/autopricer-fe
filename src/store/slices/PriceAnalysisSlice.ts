@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { CAR_DATA } from "@/app/PriceAnalysis/page";
+import { CAR_DATA } from "@/types/CarData";
 import axios from "axios";
 
 export interface PriceAnalysisRequest {
