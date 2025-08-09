@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -34,6 +34,8 @@ import PriceDistributionChart from "@/components/analytics/PriceDistributionChar
 import SearchSummary from "@/components/analytics/SearchSummary";
 import BodyTypeSelector from "@/components/search/BodyTypeSelector";
 import RangeSlider from "@/components/search/RangeSlider";
+import { useAppDispatch } from "@/store/hooks";
+import { fetchPriceAnalysis } from "@/store/slices/PriceAnalysisSlice";
 
 const CAR_DATA = {
   Audi: ["A4", "A6", "Q5", "Q7", "A3"],
@@ -61,7 +63,7 @@ const CAR_DATA = {
   Volvo: ["XC90", "XC60", "S60", "V60"],
   ВАЗ: ["21099", "2107", "2106", "2110", "Priora"],
   ЗАЗ: ["Sens", "Lanos", "Forza", "Vida", "Tavria"],
-};
+} as const;
 
 type ModelData = {
   averagePrice: number;
@@ -71,197 +73,30 @@ type ModelData = {
   totalListings: number;
   priceDistribution: Record<string, number>;
 };
-type Data = Partial<Record<Brand, Record<string, ModelData>>>;
-
-const TEST_DATA: Data = {
-  Porsche: {
-    Cayenne: {
-      averagePrice: 39500,
-      medianPrice: 38750,
-      minPrice: 27500,
-      maxPrice: 49499,
-      totalListings: 14,
-      priceDistribution: {
-        "27500-27999": 1,
-        "31500-31999": 2,
-        "32000-32499": 1,
-        "37500-37999": 1,
-        "38000-38499": 1,
-        "38500-38999": 1,
-        "40000-40499": 1,
-        "41500-41999": 1,
-        "44000-44499": 1,
-        "45000-45499": 2,
-        "46500-46999": 1,
-        "49000-49499": 1,
-      },
-    },
-  },
-  Volkswagen: {
-    Touareg: {
-      averagePrice: 30450,
-      medianPrice: 29750,
-      minPrice: 21000,
-      maxPrice: 42999,
-      totalListings: 70,
-      priceDistribution: {
-        "21000-21499": 2,
-        "22500-22999": 2,
-        "23500-23999": 1,
-        "24500-24999": 5,
-        "25000-25499": 3,
-        "25500-25999": 2,
-        "26000-26499": 2,
-        "26500-26999": 5,
-        "27000-27499": 3,
-        "27500-27999": 5,
-        "28500-28999": 3,
-        "29000-29499": 4,
-        "29500-29999": 4,
-        "30000-30499": 2,
-        "30500-30999": 1,
-        "31000-31499": 4,
-        "31500-31999": 5,
-        "32000-32499": 2,
-        "32500-32999": 3,
-        "33500-33999": 2,
-        "34000-34499": 1,
-        "34500-34999": 1,
-        "35000-35499": 4,
-        "35500-35999": 2,
-        "36000-36499": 3,
-        "38500-38999": 3,
-        "41500-41999": 1,
-        "42500-42999": 1,
-      },
-    },
-  },
-  Toyota: {
-    Camry: {
-      averagePrice: 23827,
-      medianPrice: 23727.5,
-      minPrice: 18499,
-      maxPrice: 32999,
-      totalListings: 40,
-      priceDistribution: {
-        "18400-18599": 2,
-        "18600-18799": 1,
-        "19000-19199": 1,
-        "19600-19799": 1,
-        "19800-19999": 2,
-        "20000-20199": 3,
-        "20800-20999": 2,
-        "21000-21199": 1,
-        "22000-22199": 2,
-        "22400-22599": 1,
-        "22800-22999": 2,
-        "23400-23599": 2,
-        "23800-23999": 1,
-        "24000-24199": 1,
-        "24400-24599": 2,
-        "24800-24999": 3,
-        "25400-25599": 1,
-        "25800-25999": 2,
-        "26400-26599": 2,
-        "26800-26999": 1,
-        "27400-27599": 1,
-        "28600-28799": 1,
-        "29400-29599": 3,
-        "30000-30199": 1,
-        "32800-32999": 1,
-      },
-    },
-    Corolla: {
-      averagePrice: 16500,
-      medianPrice: 15800,
-      minPrice: 12000,
-      maxPrice: 22000,
-      totalListings: 189,
-      priceDistribution: {
-        "12000-12499": 15,
-        "12500-12999": 20,
-        "13000-13499": 25,
-        "13500-13999": 15,
-        "14000-14499": 18,
-        "14500-14999": 22,
-        "15000-15499": 24,
-        "15500-15999": 16,
-        "16000-16499": 10,
-        "16500-16999": 8,
-        "17000-17999": 5,
-        "18000-18999": 4,
-        "19000-19999": 3,
-        "20000-20999": 2,
-        "21000-22000": 2,
-      },
-    },
-  },
-  BMW: {
-    "3 Series": {
-      averagePrice: 28500,
-      medianPrice: 27000,
-      minPrice: 18000,
-      maxPrice: 45000,
-      totalListings: 156,
-      priceDistribution: {
-        "18000-18499": 2,
-        "19000-19499": 3,
-        "20000-20499": 4,
-        "21000-21499": 5,
-        "22000-22499": 7,
-        "23000-23499": 8,
-        "24000-24499": 10,
-        "25000-25499": 12,
-        "26000-26499": 15,
-        "27000-27499": 13,
-        "28000-28499": 10,
-        "29000-29499": 8,
-        "30000-30499": 7,
-        "32000-32499": 6,
-        "34000-34499": 5,
-        "36000-36499": 4,
-        "38000-38499": 3,
-        "40000-40499": 2,
-        "42000-42499": 1,
-        "44000-44499": 1,
-      },
-    },
-  },
-};
-
-// type SearchFilters = {
-//   mileageRange?: number[];
-//   engineVolume?: number[];
-//   [k: string]: string | number | number[] | undefined;
-// };
 
 type RangeTuple = number[];
-type engineType = "бензин" | "дизель" | "гібрид" | "електро" | "";
-type transmissionType =
-  | "механіка"
-  | "автомат_всі"
-  | "автомат"
-  | "робот"
-  | "варіатор"
-  | "";
-type driveType = "fwd" | "rwd" | "awd" | "";
+type fuel = "Бензин" | "Дизель" | "гібрид" | "електро" | "All";
+type transmissionType = "Механіка" | "Автомат" | "Робот" | "Варіатор" | "All";
+type driveType = "fwd" | "rwd" | "awd" | "All";
 
 type SearchFilterMap = {
-  brand?: keyof typeof CAR_DATA;
-  model?: string;
-  yearFrom?: string;
-  yearTo?: string;
-  bodyType?: string;
-  engineType?: engineType;
-  transmission?: transmissionType;
-  driveType?: driveType;
-  mileageRange?: RangeTuple;
-  engineVolume?: RangeTuple;
+  brand: keyof typeof CAR_DATA;
+  model: string;
+  ifusa?: boolean | null;
+  yearfrom?: number | null;
+  yearTo?: number | null;
+  bodyType?: string | null;
+  fuel?: fuel | null;
+  transmission?: transmissionType | null;
+  driveType?: driveType | null;
+  mileageFrom?: number | null;
+  mileageTo?: number | null;
+  engineFrom: number | null;
+  engineTo: number | null;
 };
 
 // Allow arbitrary extras, but keep strong types for known keys.
-export type SearchFilters = Partial<SearchFilterMap> &
-  Record<string, string | number | RangeTuple | undefined>;
+export type SearchFilters = Partial<SearchFilterMap>;
 
 type SearchFilterKey = keyof SearchFilterMap;
 
@@ -278,6 +113,7 @@ export default function PriceAnalysisPage() {
   const [isCompareMode, setIsCompareMode] = useState(false);
   const [excludeUSA, setExcludeUSA] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const dispatch = useAppDispatch();
 
   const currentYear = new Date().getFullYear();
   const years = Array.from(
@@ -285,84 +121,189 @@ export default function PriceAnalysisPage() {
     (_, i) => currentYear - i,
   );
 
-  (useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchFilters: SearchFilters = {};
-    for (const [key, value] of urlParams.entries()) {
-      if (key === "mileageRange" || key === "engineVolume") {
-        searchFilters[key] = value.split(",").map(Number);
-      } else {
-        searchFilters[key] = value;
-      }
-    }
-    setFilters(searchFilters);
-    loadData(searchFilters, {}, isCompareMode); // Pass null for second filters initially
-  }),
-    []);
+  const didInit = useRef(false);
 
-  const loadData = (
-    searchFilters: SearchFilters,
-    searchFilters2: SearchFilters,
-    isCompareMode: boolean,
-  ) => {
-    setIsLoading(true);
-    setError(""); // Clear any previous errors at the start of a new load
+  const loadData = useCallback(
+    async (searchFilters: SearchFilters, searchFilters2: SearchFilters) => {
+      const data = await dispatch(
+        fetchPriceAnalysis({
+          brand: searchFilters.brand!,
+          model: searchFilters.model!,
+          ifusa: excludeUSA ?? false,
+          yearfrom: searchFilters.yearfrom ?? null,
+          yearTo: searchFilters.yearTo ?? null,
+          bodyType: searchFilters.bodyType ?? null,
+          fuel:
+            searchFilters.fuel === "All" ? null : (searchFilters.fuel ?? null),
+          transmission:
+            searchFilters.transmission === "All"
+              ? null
+              : (searchFilters.transmission ?? null),
+          driveType:
+            searchFilters.driveType === "All"
+              ? null
+              : (searchFilters.driveType ?? null),
+          mileageFrom: searchFilters.mileageFrom ?? null,
+          mileageTo: searchFilters.mileageTo ?? null,
+          engineFrom: searchFilters.engineFrom ?? null,
+          engineTo: searchFilters.engineTo ?? null,
+        }),
+      ).unwrap();
 
-    setTimeout(() => {
-      // First car data
-      const brand1 = searchFilters.brand;
-      const model1 = searchFilters.model;
-      if (brand1 && model1 && TEST_DATA[brand1] && TEST_DATA[brand1][model1]) {
-        setData(TEST_DATA[brand1][model1]);
-      } else {
-        setData(null); // Set to null if specific car not found in TEST_DATA
-        // Only set error if brand and model are actually selected but data is missing
-        if (brand1 && model1) {
-          setError(
-            "Дані для обраної марки та моделі відсутні. Спробуйте іншу комбінацію.",
-          );
-        }
-      }
-
-      // Second car data (only if compare mode is active)
       if (
         isCompareMode &&
         searchFilters2 &&
         searchFilters2.brand &&
         searchFilters2.model
       ) {
-        const brand2 = searchFilters2.brand;
-        const model2 = searchFilters2.model;
+        const data2 = await dispatch(
+          fetchPriceAnalysis({
+            brand: searchFilters2.brand!,
+            model: searchFilters2.model!,
+            ifusa: excludeUSA ?? false,
+            yearfrom: searchFilters.yearfrom ?? null,
+            yearTo: searchFilters.yearTo ?? null,
+            bodyType: searchFilters.bodyType ?? null,
+            fuel:
+              searchFilters.fuel === "All"
+                ? null
+                : (searchFilters.fuel ?? null),
+            transmission:
+              searchFilters.transmission === "All"
+                ? null
+                : (searchFilters.transmission ?? null),
+            driveType:
+              searchFilters.driveType === "All"
+                ? null
+                : (searchFilters.driveType ?? null),
+            mileageFrom: searchFilters.mileageFrom ?? null,
+            mileageTo: searchFilters.mileageTo ?? null,
+            engineFrom: searchFilters.engineFrom ?? null,
+            engineTo: searchFilters.engineTo ?? null,
+          }),
+        ).unwrap();
+        const brand1 = searchFilters2.brand;
+        const model1 = searchFilters2.model;
+        setData2(data2.data[brand1][model1]);
+      }
+
+      setIsLoading(true);
+      setError("");
+
+      setTimeout(() => {
+        // First car data
+        const brand1 = searchFilters.brand;
+        const model1 = searchFilters.model;
         if (
-          brand2 &&
-          model2 &&
-          TEST_DATA[brand2] &&
-          TEST_DATA[brand2][model2]
+          brand1 &&
+          model1 &&
+          data.data[brand1] &&
+          data.data[brand1][model1]
         ) {
-          setData2(TEST_DATA[brand2][model2]);
+          setData(data.data[brand1][model1]);
         } else {
-          setData2(null); // No data for second car if not found in TEST_DATA
-          if (brand2 && model2) {
-            setError((prev) =>
-              prev
-                ? prev + " " + "Дані для другого автомобіля відсутні."
-                : "Дані для другого автомобіля відсутні.",
+          setData(null); // Set to null if specific car not found in TEST_DATA
+          // Only set error if brand and model are actually selected but data is missing
+          if (brand1 && model1) {
+            setError(
+              "Дані для обраної марки та моделі відсутні. Спробуйте іншу комбінацію.",
             );
           }
         }
-      } else {
-        setData2(null); // Clear data2 if not in compare mode or no second filters
-      }
+        setIsLoading(false);
+      }, 800);
+    },
+    [dispatch, excludeUSA, isCompareMode],
+  );
 
+  useEffect(() => {
+    if (didInit.current) return;
+    didInit.current = true;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let searchFilters: SearchFilters = {};
+    const hasBrand = urlParams.has("brand");
+    const hasModel = urlParams.has("model");
+
+    if (!hasBrand || !hasModel) {
       setIsLoading(false);
-    }, 800);
-  };
+      return;
+    }
+
+    const numberKeys = [
+      "yearfrom",
+      "yearTo",
+      "mileageFrom",
+      "mileageTo",
+      "engineFrom",
+      "engineTo",
+    ] as const;
+
+    const allowedKeys = new Set<keyof SearchFilters>([
+      "brand",
+      "model",
+      "bodyType",
+      "fuel",
+      "transmission",
+      "driveType",
+      ...numberKeys,
+    ]);
+    const isFilterKey = (k: string): k is keyof SearchFilters =>
+      allowedKeys.has(k as keyof SearchFilters);
+
+    function coerce<K extends keyof SearchFilters>(
+      k: K,
+      raw: string,
+    ): SearchFilters[K] {
+      if (
+        (k === "fuel" ||
+          k === "transmission" ||
+          k === "driveType" ||
+          k === "bodyType") &&
+        raw === "All"
+      ) {
+        return null as SearchFilters[K];
+      }
+      if (k === "brand") return raw as Brand as SearchFilters[K];
+      if (k === "model") return (raw ?? "") as SearchFilters[K];
+
+      const numberKeys = new Set<keyof SearchFilters>([
+        "yearfrom",
+        "yearTo",
+        "mileageFrom",
+        "mileageTo",
+        "engineFrom",
+        "engineTo",
+      ]);
+      if (numberKeys.has(k))
+        return (raw ? Number(raw) : null) as SearchFilters[K];
+
+      return (raw || null) as SearchFilters[K];
+    }
+
+    for (const [rawKey, rawValue] of urlParams.entries()) {
+      if (rawKey === "excludeUSA") {
+        setExcludeUSA(rawValue === "true");
+        continue;
+      }
+      if (isFilterKey(rawKey)) {
+        const k = rawKey as keyof SearchFilters;
+        searchFilters = {
+          ...searchFilters,
+          [k]: coerce(k, rawValue),
+        } as SearchFilters;
+      }
+    }
+
+    setFilters(searchFilters);
+    loadData(searchFilters, {} as SearchFilters);
+  }, [loadData]);
 
   const validateYears = (currentFilters: SearchFilters) => {
-    const yearFrom = parseInt(currentFilters.yearFrom!);
-    const yearTo = parseInt(currentFilters.yearTo!);
+    const yearfrom = parseInt(String(currentFilters.yearfrom));
+    const yearTo = parseInt(String(currentFilters.yearTo));
 
-    if (yearFrom && yearTo && yearFrom > yearTo) {
+    if (yearfrom && yearTo && yearfrom > yearTo) {
       setError(
         'Неможливо почати пошук - значення "від" не можуть бути більшими за "до"',
       );
@@ -388,7 +329,7 @@ export default function PriceAnalysisPage() {
     setFilters(newFilters);
 
     // Validate years immediately on change for better user feedback
-    if (key === "yearFrom" || key === "yearTo") {
+    if (key === "yearfrom" || key === "yearTo") {
       validateYears(newFilters);
     } else {
       // If changing other filters, clear year validation error if it exists
@@ -403,7 +344,7 @@ export default function PriceAnalysisPage() {
         if (Array.isArray(v)) {
           params.set(k, v.join(","));
         } else {
-          params.set(k, v);
+          params.set(k, String(v));
         }
       }
     });
@@ -443,7 +384,7 @@ export default function PriceAnalysisPage() {
     if (!validateYears(filters)) {
       return; // Validation error already set by validateYears
     }
-    loadData(filters, isCompareMode ? filters2 : {}, isCompareMode);
+    loadData(filters, isCompareMode ? filters2 : {});
   };
 
   const resetAllFilters = () => {
@@ -475,6 +416,22 @@ export default function PriceAnalysisPage() {
       }
     });
   };
+
+  const [mileageDraft, setMileageDraft] = useState<RangeTuple>([
+    filters.mileageFrom ?? 0,
+    filters.mileageTo ?? 200000,
+  ]);
+  useEffect(() => {
+    setMileageDraft([filters.mileageFrom ?? 0, filters.mileageTo ?? 200000]);
+  }, [filters.mileageFrom, filters.mileageTo]);
+
+  const [engineDraft, setEngineDraft] = useState<RangeTuple>([
+    filters.engineFrom ?? 1,
+    filters.engineTo ?? 4,
+  ]);
+  useEffect(() => {
+    setEngineDraft([filters.engineFrom ?? 1, filters.engineTo ?? 4]);
+  }, [filters.engineFrom, filters.engineTo]);
 
   if (isLoading) {
     return (
@@ -578,7 +535,7 @@ export default function PriceAnalysisPage() {
                       handleFilterChange("brand", value)
                     }
                   >
-                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20">
+                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full">
                       <SelectValue placeholder="Оберіть марку" />
                     </SelectTrigger>
                     <SelectContent>
@@ -601,7 +558,7 @@ export default function PriceAnalysisPage() {
                     }
                     disabled={!filters.brand}
                   >
-                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20">
+                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full">
                       <SelectValue placeholder="Оберіть модель" />
                     </SelectTrigger>
                     <SelectContent>
@@ -619,13 +576,13 @@ export default function PriceAnalysisPage() {
                 <div className="space-y-2">
                   <Label className="text-slate-700 font-medium">Рік від</Label>
                   <Select
-                    value={filters.yearFrom || ""}
+                    value={String(filters.yearfrom) || ""}
                     onValueChange={(value) =>
-                      handleFilterChange("yearFrom", value)
+                      handleFilterChange("yearfrom", Number(value))
                     }
                   >
                     <SelectTrigger
-                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""}`}
+                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""} w-full`}
                     >
                       <SelectValue placeholder="Від року" />
                     </SelectTrigger>
@@ -643,13 +600,13 @@ export default function PriceAnalysisPage() {
                 <div className="space-y-2">
                   <Label className="text-slate-700 font-medium">Рік до</Label>
                   <Select
-                    value={filters.yearTo || ""}
+                    value={String(filters.yearTo) || ""}
                     onValueChange={(value) =>
-                      handleFilterChange("yearTo", value)
+                      handleFilterChange("yearTo", Number(value))
                     }
                   >
                     <SelectTrigger
-                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""}`}
+                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""} w-full`}
                     >
                       <SelectValue placeholder="До року" />
                     </SelectTrigger>
@@ -818,20 +775,20 @@ export default function PriceAnalysisPage() {
                         Тип пального
                       </Label>
                       <Select
-                        value={filters.engineType || ""}
-                        onValueChange={(value: engineType) =>
-                          handleFilterChange("engineType", value)
+                        value={filters.fuel || ""}
+                        onValueChange={(value: fuel) =>
+                          handleFilterChange("fuel", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500">
+                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
                           <SelectValue placeholder="Оберіть тип" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Всі типи</SelectItem>
-                          <SelectItem value="бензин">Бензин</SelectItem>
-                          <SelectItem value="дизель">Дизель</SelectItem>
-                          <SelectItem value="гібрид">Гібрид</SelectItem>
-                          <SelectItem value="електро">Електро</SelectItem>
+                          <SelectItem value="All">Всі типи</SelectItem>
+                          <SelectItem value="Бензин">Бензин</SelectItem>
+                          <SelectItem value="Дизель">Дизель</SelectItem>
+                          <SelectItem value="Гібрид">Гібрид</SelectItem>
+                          <SelectItem value="Електро">Електро</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -847,18 +804,18 @@ export default function PriceAnalysisPage() {
                           handleFilterChange("transmission", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500">
+                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
                           <SelectValue placeholder="Оберіть тип" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Всі типи</SelectItem>
-                          <SelectItem value="механіка">Механіка</SelectItem>
-                          <SelectItem value="автомат_всі">
-                            Автомат (всі типи)
+                          <SelectItem value="All">Всі типи</SelectItem>
+                          <SelectItem value="Ручна / Механіка">
+                            Ручна / Механіка
                           </SelectItem>
-                          <SelectItem value="автомат">Автомат</SelectItem>
-                          <SelectItem value="робот">Робот</SelectItem>
-                          <SelectItem value="варіатор">Варіатор</SelectItem>
+                          <SelectItem value="Типтронік">Типтронік</SelectItem>
+                          <SelectItem value="Автомат">Автомат</SelectItem>
+                          <SelectItem value="Робот">Робот</SelectItem>
+                          <SelectItem value="Варіатор">Варіатор</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -874,14 +831,16 @@ export default function PriceAnalysisPage() {
                           handleFilterChange("driveType", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500">
+                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
                           <SelectValue placeholder="Оберіть тип" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Всі типи</SelectItem>
-                          <SelectItem value="fwd">Передній (FWD)</SelectItem>
-                          <SelectItem value="rwd">Задній (RWD)</SelectItem>
-                          <SelectItem value="awd">Повний (AWD)</SelectItem>
+                          <SelectItem value="All">Всі типи</SelectItem>
+                          <SelectItem value="Передній">
+                            Передній (FWD)
+                          </SelectItem>
+                          <SelectItem value="Задній">Задній (RWD)</SelectItem>
+                          <SelectItem value="Повний">Повний (AWD)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -895,9 +854,14 @@ export default function PriceAnalysisPage() {
                         min={0}
                         max={500000}
                         step={5000}
-                        value={filters.mileageRange || [0, 200000]}
-                        onChange={(value: RangeTuple) =>
-                          handleFilterChange("mileageRange", value)
+                        value={mileageDraft}
+                        onChange={setMileageDraft}
+                        onCommit={([min, max]: [number, number]) =>
+                          setFilters((p) => ({
+                            ...p,
+                            mileageFrom: min,
+                            mileageTo: max,
+                          }))
                         }
                         unit="км"
                       />
@@ -910,9 +874,14 @@ export default function PriceAnalysisPage() {
                         min={1.0}
                         max={6.0}
                         step={0.1}
-                        value={filters.engineVolume || [1.0, 4.0]}
-                        onChange={(value: RangeTuple) =>
-                          handleFilterChange("engineVolume", value)
+                        value={engineDraft}
+                        onChange={setEngineDraft}
+                        onCommit={([min, max]: [number, number]) =>
+                          setFilters((p) => ({
+                            ...p,
+                            engineFrom: min,
+                            engineTo: max,
+                          }))
                         }
                         unit="л"
                       />

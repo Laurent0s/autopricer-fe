@@ -5,13 +5,13 @@ import { Tag, BarChart2 } from "lucide-react";
 
 export default function CarResultCard({ car }) {
   return (
-    <Card className="overflow-hidden shadow-lg border-0 hover:shadow-xl transition-shadow duration-300">
+    <Card className="overflow-hidden shadow-lg border-0 hover:shadow-xl transition-shadow duration-300 w-full p-6">
       <div className="flex flex-col md:flex-row">
-        <div className="md:w-1/3">
+        <div className="md:w-1/3 h-52">
           <img
             src={car.imageUrl}
             alt={`${car.brand} ${car.model}`}
-            className="w-full h-48 md:h-full object-cover"
+            className="w-full h-full object-cover rounded-xl"
           />
         </div>
         <div className="md:w-2/3 flex">
@@ -20,7 +20,13 @@ export default function CarResultCard({ car }) {
               {car.brand} {car.model}
             </h3>
             <p className="text-sm text-slate-500 mb-3">
-              {car.generation} · {car.years}
+              {car.generation ? (
+                <>
+                  {car.generation} · {car.years}
+                </>
+              ) : (
+                car.years
+              )}
             </p>
 
             <div className="flex items-baseline gap-4 mb-4">

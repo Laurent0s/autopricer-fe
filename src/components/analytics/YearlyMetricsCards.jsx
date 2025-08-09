@@ -3,53 +3,30 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRightLeft, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function YearlyMetricsCards({ data, data2 }) {
-  const metricsData = useMemo(() => {
-    let priceRange1 = { min: Infinity, max: -Infinity };
-    let totalListings1 = 0;
-
-    if (data) {
-      data.forEach((item) => {
-        if (item.avg_price < priceRange1.min) priceRange1.min = item.avg_price;
-        if (item.avg_price > priceRange1.max) priceRange1.max = item.avg_price;
-        totalListings1 += item.listings;
-      });
-    }
-
-    let priceRange2 = null;
-    let totalListings2 = null;
-
-    if (data2) {
-      priceRange2 = { min: Infinity, max: -Infinity };
-      totalListings2 = 0;
-      data2.forEach((item) => {
-        if (item.avg_price < priceRange2.min) priceRange2.min = item.avg_price;
-        if (item.avg_price > priceRange2.max) priceRange2.max = item.avg_price;
-        totalListings2 += item.listings;
-      });
-    }
-
-    return { priceRange1, totalListings1, priceRange2, totalListings2 };
-  }, [data, data2]);
-
-  const { priceRange1, totalListings1, priceRange2, totalListings2 } =
-    metricsData;
-
+export default function YearlyMetricsCards({
+  averagePriceFrom1,
+  averagePriceTo1,
+  averagePriceFrom2,
+  averagePriceTo2,
+  quantity1,
+  quantity2,
+}) {
+  console.log(averagePriceFrom1);
   const metrics = [
     {
       title: "Діапазон середніх цін",
-      value: `$${priceRange1.min === Infinity ? "0" : priceRange1.min.toLocaleString()} - $${priceRange1.max === -Infinity ? "0" : priceRange1.max.toLocaleString()}`,
+      value: `$${averagePriceFrom1} - $${averagePriceTo1}`,
       value2:
-        priceRange2 && priceRange2.min !== Infinity
-          ? `$${priceRange2.min.toLocaleString()} - $${priceRange2.max.toLocaleString()}`
+        averagePriceFrom2 && averagePriceTo2
+          ? `$${averagePriceFrom2} - $${averagePriceTo2}`
           : null,
       icon: ArrowRightLeft,
       color: "from-orange-500 to-red-500",
     },
     {
       title: "Загальна кількість оголошень",
-      value: totalListings1.toLocaleString(),
-      value2: totalListings2 != null ? totalListings2.toLocaleString() : null,
+      value: quantity1,
+      value2: quantity2,
       icon: FileText,
       color: "from-purple-500 to-pink-500",
     },

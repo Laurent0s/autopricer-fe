@@ -100,11 +100,11 @@ export default function AdvancedFilters({ filters, onFilterChange, onReset }) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={null}>Всі типи</SelectItem>
-              <SelectItem value="седан">Седан</SelectItem>
-              <SelectItem value="хетчбек">Хетчбек</SelectItem>
-              <SelectItem value="універсал">Універсал</SelectItem>
-              <SelectItem value="кросовер">Кросовер</SelectItem>
-              <SelectItem value="позашляховик">Позашляховик</SelectItem>
+              <SelectItem value="Седан">Седан</SelectItem>
+              <SelectItem value="Хетчбек">Хетчбек</SelectItem>
+              <SelectItem value="Універсал">Універсал</SelectItem>
+              <SelectItem value="Кросовер">Кросовер</SelectItem>
+              <SelectItem value="Позашляховик">Позашляховик</SelectItem>
             </SelectContent>
           </Select>
         </div>

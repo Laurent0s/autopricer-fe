@@ -10,28 +10,39 @@ export default function RangeSlider({
   step = 1,
   value,
   onChange,
+  onCommit,
   formatValue = (v) => v.toLocaleString(),
   unit = "",
 }) {
-  const [localValue, setLocalValue] = React.useState(value || [min, max]);
+  const [localValue, setLocalValue] = React.useState(value ?? [min, max]);
 
   React.useEffect(() => {
-    if (value && Array.isArray(value)) {
-      setLocalValue(value);
-    }
+    if (Array.isArray(value)) setLocalValue(value);
   }, [value]);
 
-  const handleSliderChange = (newValue) => {
-    setLocalValue(newValue);
-    onChange(newValue);
+  const handleSliderChange = (v) => {
+    setLocalValue(v);
+    onChange?.(v);
+  };
+
+  const handleSliderCommit = (v) => {
+    setLocalValue(v);
+    onCommit?.(v);
   };
 
   const handleInputChange = (index, inputValue) => {
-    const numValue = parseFloat(inputValue) || (index === 0 ? min : max);
-    const newValue = [...localValue];
-    newValue[index] = Math.max(min, Math.min(max, numValue));
-    setLocalValue(newValue);
-    onChange(newValue);
+    const num = parseFloat(inputValue);
+    const fallback = index === 0 ? min : max;
+    const clamped = Math.max(min, Math.min(max, isNaN(num) ? fallback : num));
+    const next = [...localValue];
+    next[index] = clamped;
+    setLocalValue(next);
+    onChange?.(next);
+  };
+
+  const commitFromInputs = () => onCommit?.(localValue);
+  const commitOnEnter = (e) => {
+    if (e.key === "Enter") onCommit?.(localValue);
   };
 
   return (
@@ -42,10 +53,13 @@ export default function RangeSlider({
         <Slider
           value={localValue}
           onValueChange={handleSliderChange}
+          onValueCommit={handleSliderCommit}
           max={max}
           min={min}
           step={step}
           className="w-full"
+          onPointerUp={() => onCommit?.(localValue)}
+          onTouchEnd={() => onCommit?.(localValue)}
         />
       </div>
 
@@ -57,13 +71,15 @@ export default function RangeSlider({
               type="number"
               value={localValue[0]}
               onChange={(e) => handleInputChange(0, e.target.value)}
+              onBlur={commitFromInputs}
+              onKeyDown={commitOnEnter}
               className="h-9 text-sm pr-8"
               min={min}
               max={max}
               step={step}
             />
             {unit && (
-              <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-slate-500">
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500">
                 {unit}
               </span>
             )}
@@ -79,13 +95,15 @@ export default function RangeSlider({
               type="number"
               value={localValue[1]}
               onChange={(e) => handleInputChange(1, e.target.value)}
+              onBlur={commitFromInputs}
+              onKeyDown={commitOnEnter}
               className="h-9 text-sm pr-8"
               min={min}
               max={max}
               step={step}
             />
             {unit && (
-              <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-slate-500">
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500">
                 {unit}
               </span>
             )}

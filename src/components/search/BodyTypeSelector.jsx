@@ -3,12 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Check } from "lucide-react";
 
 const BODY_TYPES = [
-  { value: "седан", label: "Седан", icon: "🚗" },
-  { value: "кросовер", label: "Кросовер", icon: "🚙" },
-  { value: "купе", label: "Купе", icon: "🏎️" },
-  { value: "універсал", label: "Універсал", icon: "🚛" },
-  { value: "хетчбек", label: "Хетчбек", icon: "🚐" },
-  { value: "мінівен", label: "Мінівен", icon: "🚌" },
+  { value: "Седан", label: "Седан", icon: "🚗" },
+  { value: "Кросовер", label: "Кросовер", icon: "🚙" },
+  { value: "Купе", label: "Купе", icon: "🏎️" },
+  { value: "Універсал", label: "Універсал", icon: "🚛" },
+  { value: "Хетчбек", label: "Хетчбек", icon: "🚐" },
+  { value: "Мінівен", label: "Мінівен", icon: "🚌" },
 ];
 
 export default function BodyTypeSelector({ selected, onSelect }) {
