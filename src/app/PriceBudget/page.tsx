@@ -186,7 +186,7 @@ export default function BudgetFinderPage() {
     setLimit(Number(value));
   }
 
-  const handleAnalysisSearch = (Filters: any) => {
+  const handleAnalysisSearch = (Filters: SearchFilters) => {
     const params = new URLSearchParams();
     Object.entries(Filters).forEach(([k, v]) => {
       if (v && v !== "") {
