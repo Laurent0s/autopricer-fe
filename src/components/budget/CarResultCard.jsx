@@ -5,16 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Tag, BarChart2 } from "lucide-react";
 
 export default function CarResultCard({ car, handleAnalysisSearch }) {
-  const years = car.years.split('-');
-  const yearfrom = years[0];
-  const yearTo = years[1];
+  let years = [];
+  let yearfrom = '';
+  let yearTo = '';
+
+  if(car.years.includes('-')) {
+    years = car.years.split('-');
+    yearfrom = years[0];
+    yearTo = years[1];
+  } else {
+    yearfrom = years;
+  }
   const carData = {
     brand: car.brand,
     model: car.model,
-    yearfrom: yearfrom,
-    yearTo: yearTo,
+    yearfrom: yearfrom ?? null,
+    yearTo: yearTo ?? null,
     bodyType: car.bodyType ?? null,
-    fuel: car.fuel ?? null,
+    fuel: car.fuel.split(',')[0] ?? null,
     transmission: car.transmission.split(',')[0] ?? null,
     driveType: car.driveType ?? null,
   };

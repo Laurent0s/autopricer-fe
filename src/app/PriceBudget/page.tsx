@@ -117,6 +117,7 @@ export default function BudgetFinderPage() {
 
   const handleSearch = useCallback(async () => {
     setIsSearching(true);
+    setResults([]);
     if(!filters?.price) {
       setIsSearching(false);
       return null;
