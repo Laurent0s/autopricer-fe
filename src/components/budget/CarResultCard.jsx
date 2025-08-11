@@ -1,9 +1,23 @@
+'use client'
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tag, BarChart2 } from "lucide-react";
 
-export default function CarResultCard({ car }) {
+export default function CarResultCard({ car, handleAnalysisSearch }) {
+  const years = car.years.split('-');
+  const yearfrom = years[0];
+  const yearTo = years[1];
+  const carData = {
+    brand: car.brand,
+    model: car.model,
+    yearfrom: yearfrom,
+    yearTo: yearTo,
+    bodyType: car.bodyType ?? null,
+    fuel: car.fuel ?? null,
+    transmission: car.transmission.split(',')[0] ?? null,
+    driveType: car.driveType ?? null,
+  };
   return (
     <Card className="overflow-hidden shadow-lg border-0 hover:shadow-xl transition-shadow duration-300 w-full p-6">
       <div className="flex flex-col md:flex-row">
@@ -44,7 +58,9 @@ export default function CarResultCard({ car }) {
               </div>
             </div>
 
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => 
+              handleAnalysisSearch(carData)
+              }>
               <BarChart2 className="w-4 h-4 mr-2" />
               Аналіз цін
             </Button>

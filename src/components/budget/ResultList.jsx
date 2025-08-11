@@ -1,3 +1,4 @@
+'use client'
 import React from "react";
 import {
   Select,
@@ -24,6 +25,8 @@ export default function ResultList({
   handleNext,
   handlePrevious,
   handleSpecific,
+  handleModelsNumber,
+  handleAnalysisSearch,
   page,
   pagemax,
   totalOffers,
@@ -37,16 +40,16 @@ export default function ResultList({
         </p>
         <div className="flex items-center gap-2">
           <ListFilter className="w-4 h-4 text-slate-500" />
-          <Label>Сортування:</Label>
-          <Select defaultValue="price-asc">
+          <Label>Моделей на сторінці:</Label>
+          <Select defaultValue="10" onValueChange={(value) => {handleModelsNumber(value)}}>
             <SelectTrigger className="w-[180px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="price-asc">Ціна: по зростанню</SelectItem>
-              <SelectItem value="price-desc">Ціна: по спаданню</SelectItem>
-              <SelectItem value="listings-desc">
-                Пропозиції: по спаданню
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="25">25</SelectItem>
+              <SelectItem value="50">
+                50
               </SelectItem>
             </SelectContent>
           </Select>
@@ -62,15 +65,15 @@ export default function ResultList({
         }}
       >
         {results.map((car) => (
-          <CarResultCard key={car.imageurl} car={car} />
+          <CarResultCard key={`${car.brand}-${car.model}-${car.bodyType}-${car.years}`} car={car} handleAnalysisSearch={handleAnalysisSearch}/>
         ))}
         <Pagination>
           <PaginationContent>
-            <PaginationItem onClick={handlePrevious}>
-              <PaginationPrevious href="#" />
-            </PaginationItem>
             {page > 2 ? (
               <>
+                <PaginationItem onClick={handlePrevious}>
+                  <PaginationPrevious href="#" />
+                </PaginationItem>
                 <PaginationItem
                   onClick={() => {
                     handleSpecific(1);

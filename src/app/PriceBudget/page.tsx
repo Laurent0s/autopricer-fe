@@ -24,6 +24,7 @@ import FilterSidebar from "@/components/budget/FilterSidebar";
 import ResultList from "@/components/budget/ResultList";
 import { useAppDispatch } from "@/store/hooks";
 import { fetchBudget, PriceBudgetsCar } from "@/store/slices/PriceBudgetSlice";
+import { useRouter } from "next/navigation";
 
 const CAR_DATA = {
   Audi: ["A4", "A6", "Q5", "Q7", "A3"],
@@ -99,6 +100,7 @@ export default function BudgetFinderPage() {
   const [totalOffers, setTotalOffers] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const currentYear = new Date().getFullYear();
   const years = Array.from(
@@ -115,7 +117,10 @@ export default function BudgetFinderPage() {
 
   const handleSearch = useCallback(async () => {
     setIsSearching(true);
-    setLimit(10);
+    if(!filters?.price) {
+      setIsSearching(false);
+      return null;
+    }
     const data = await dispatch(
       fetchBudget({
         price: filters?.price ?? 0,
@@ -126,10 +131,14 @@ export default function BudgetFinderPage() {
         ifusa: excludeUSA,
         yearfrom: filters?.yearfrom ?? null,
         yearTo: filters?.yearTo ?? null,
-        bodyType: filters?.bodyType ?? null,
-        fuel: filters?.fuel ?? null,
-        transmission: filters?.transmission ?? null,
-        driveType: filters?.driveType ?? null,
+        bodyType: filters.bodyType === "All" ? null : (filters.bodyType ?? null),
+        fuel: filters.fuel === "All" ? null : (filters.fuel ?? null),
+        transmission: filters.transmission === "All"
+              ? null
+              : (filters.transmission ?? null),
+        driveType: filters.driveType === "All"
+              ? null
+              : (filters.driveType ?? null),
         mileageFrom: filters?.mileageFrom ?? null,
         mileageTo: filters?.mileageTo ?? null,
         engineFrom: filters?.engineFrom ?? null,
@@ -139,11 +148,11 @@ export default function BudgetFinderPage() {
     setResults(data.data);
     setTotalOffers(Number(data.totalOffers));
     setIsSearching(false);
-  }, [dispatch, filters, page, limit, excludeUSA]);
+  }, [dispatch,filters, page, limit]);
 
   useEffect(() => {
     handleSearch();
-  }, [handleSearch]);
+  }, [page, limit]);
 
   const [mileageDraft, setMileageDraft] = useState<RangeTuple>([
     filters?.mileageFrom ?? 0,
@@ -172,6 +181,26 @@ export default function BudgetFinderPage() {
   const handleSpecific = (page: number) => {
     setPage(page);
   };
+
+  const handleModelsNumber = (value: string) => {
+    setLimit(Number(value));
+  }
+
+  const handleAnalysisSearch = (Filters: any) => {
+    const params = new URLSearchParams();
+    Object.entries(Filters).forEach(([k, v]) => {
+      if (v && v !== "") {
+        if (Array.isArray(v)) {
+          params.set(k, v.join(","));
+        } else {
+          params.set(k, String(v));
+        }
+      }
+    });
+    // This only updates the URL for the main filters, not for compare mode filters
+
+    router.push(`/PriceAnalysis?${params.toString()}`);
+  }
 
   return (
     <div className="min-h-screen py-8 px-4">
@@ -510,7 +539,7 @@ export default function BudgetFinderPage() {
             className="grid grid-cols-1 lg:grid-cols-4 gap-8"
           >
             <div className="lg:col-span-1">
-              <FilterSidebar />
+              <FilterSidebar CAR_DATA={CAR_DATA} filters={filters} handleFilterChange={handleFilterChange} years={years} engineDraft={engineDraft} setEngineDraft={setEngineDraft} handleSearch={handleSearch} setPage={setPage} setFilters={setFilters}/>
             </div>
             <div className="lg:col-span-3">
               <ResultList
@@ -518,6 +547,8 @@ export default function BudgetFinderPage() {
                 handleNext={handleNext}
                 handlePrevious={handlePrevious}
                 handleSpecific={handleSpecific}
+                handleModelsNumber={handleModelsNumber}
+                handleAnalysisSearch={handleAnalysisSearch}
                 page={page}
                 pagemax={Math.ceil(totalOffers / limit)}
                 totalOffers={totalOffers}
