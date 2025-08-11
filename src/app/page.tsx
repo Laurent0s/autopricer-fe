@@ -122,9 +122,9 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl md:text-7xl font-bold text-slate-800 mb-6">
+            <h1 className="flex flex-col text-5xl md:text-7xl font-bold text-slate-800 mb-6">
               Допомагаємо знайти
-              <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="inline-block text-blue-600 bg-clip-text">
                 твоє наступне авто
               </span>
             </h1>
