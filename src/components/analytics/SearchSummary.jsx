@@ -16,7 +16,7 @@ export default function SearchSummary({ filters, filters2 }) {
     const icons = {
       brand: Car,
       model: Settings,
-      yearFrom: Calendar,
+      yearfrom: Calendar,
       yearTo: Calendar,
       engineType: Fuel,
       transmission: Settings,
@@ -32,7 +32,7 @@ export default function SearchSummary({ filters, filters2 }) {
     const labels = {
       brand: "Марка",
       model: "Модель",
-      yearFrom: "Рік від",
+      yearfrom: "Рік від",
       yearTo: "Рік до",
       engineType: "Двигун",
       transmission: "КПП",

@@ -113,6 +113,12 @@ export default function PriceDistributionChart({
           </div>
           <span>Розподіл цін за кількістю пропозицій</span>
         </CardTitle>
+        <p className="text-blue-700">{filters.brand} {filters.model}</p>
+        {
+          filters2.brand && filters2.model && (
+            <p className="text-[#f43f5e]">{filters2.brand} {filters2.model}</p>
+          )
+        }
       </CardHeader>
       <CardContent>
         <div className="w-full overflow-x-auto pb-4">
@@ -136,10 +142,6 @@ export default function PriceDistributionChart({
               />
               <YAxis stroke="#64748b" fontSize={12} allowDecimals={false} />
               <Tooltip content={<CustomTooltip />} />
-              <Legend
-                verticalAlign="top"
-                wrapperStyle={{ paddingBottom: "20px" }}
-              />
               <Bar
                 dataKey="count1"
                 name={

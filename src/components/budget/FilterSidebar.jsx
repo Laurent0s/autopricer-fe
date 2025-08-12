@@ -19,8 +19,8 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
         <CardTitle className="text-lg">Фільтри</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col gap-2">
-          <Label className="text-slate-700 font-medium pb-2">Марка</Label>
+        <div className="flex flex-col gap-3">
+          <Label className="text-slate-700 font-medium ">Марка</Label>
           <Select
             value={filters.brand || ""}
             onValueChange={(value) =>
@@ -38,7 +38,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
               ))}
             </SelectContent>
           </Select>
-          <Label className="text-slate-700 font-medium pb-2">Модель</Label>
+          <Label className="text-slate-700 font-medium ">Модель</Label>
                   <Select
                     value={filters.model || ""}
                     onValueChange={(value) =>
@@ -61,7 +61,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
           
           <div className="flex gap-2">
             <div className="flex-1">
-              <Label className="text-slate-700 font-medium pb-2">Рік від</Label>
+              <Label className="text-slate-700 font-medium pb-3">Рік від</Label>
                   <Select
                     value={filters?.yearfrom ? String(filters.yearfrom) : ""}
                     onValueChange={(value) =>
@@ -85,7 +85,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
             </div>
           
             <div className="flex-1">
-              <Label className="text-slate-700 font-medium pb-2">Рік до</Label>
+              <Label className="text-slate-700 font-medium pb-3">Рік до</Label>
                   <Select
                     value={filters?.yearTo ? String(filters?.yearTo) : ""}
                     onValueChange={(value) =>
@@ -109,7 +109,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
             </div>
           </div>
 
-          <Label className="text-slate-700 font-medium">
+          <Label className="text-slate-700 font-medium ">
                       Тип пального
                     </Label>
                     <Select

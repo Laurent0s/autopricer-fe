@@ -65,7 +65,7 @@ export default function ResultList({
         }}
       >
         {results.map((car) => (
-          <CarResultCard key={`${car.brand}-${car.model}-${car.bodyType}-${car.years}`} car={car} handleAnalysisSearch={handleAnalysisSearch}/>
+          <CarResultCard key={`${car.brand}-${car.model}-${car.bodyType}-${car.years}-${car.id}`} car={car} handleAnalysisSearch={handleAnalysisSearch}/>
         ))}
         <Pagination>
           <PaginationContent>

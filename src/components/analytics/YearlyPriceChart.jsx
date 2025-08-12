@@ -81,6 +81,12 @@ export default function YearlyPriceChart({ data, data2, filters, filters2 }) {
           </div>
           <span>Порівняння цін по роках</span>
         </CardTitle>
+        <p className="text-blue-700">{filters.brand} {filters.model}</p>
+        {
+          filters2.brand && filters2.model && (
+            <p className="text-[#f43f5e]">{filters2.brand} {filters2.model}</p>
+          )
+        }
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={400}>
@@ -97,10 +103,6 @@ export default function YearlyPriceChart({ data, data2, filters, filters2 }) {
               allowDecimals={false}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend
-              verticalAlign="top"
-              wrapperStyle={{ paddingBottom: "20px" }}
-            />
             <Bar
               dataKey="price1"
               name={

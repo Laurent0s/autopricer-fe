@@ -484,13 +484,13 @@ export default function PriceYears() {
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 cursor-pointer"
               onClick={resetAllFilters}
             >
               <RotateCcw className="w-4 h-4" />
               <span>Скинути</span>
             </Button>
-            <Button onClick={handleShare} className="w-36">
+            <Button onClick={handleShare} className="w-36 cursor-pointer">
               {isCopied ? (
                 <>
                   <Check className="w-4 h-4 mr-2" />
@@ -704,7 +704,7 @@ export default function PriceYears() {
                   <CollapsibleTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="text-slate-700 hover:bg-white/50 p-2 h-auto text-sm font-medium"
+                      className="text-slate-700 hover:bg-white/50 p-2 h-auto text-sm font-medium cursor-pointer"
                     >
                       <span className="mr-2">Додаткові параметри</span>
                       {showAdvanced ? (
@@ -719,6 +719,7 @@ export default function PriceYears() {
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                   <div className="flex items-center space-x-3">
                     <Switch
+                      className="cursor-pointer"
                       id="exclude-usa"
                       checked={excludeUSA}
                       onCheckedChange={setExcludeUSA}
@@ -740,7 +741,7 @@ export default function PriceYears() {
                           (!filters2.brand || !filters2.model)) ||
                         !!error
                       }
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                     >
                       <Search className="w-4 h-4 mr-2" />
                       Перевірити ціни
@@ -758,20 +759,37 @@ export default function PriceYears() {
                     Додаткові параметри
                   </h4>
 
-                  {/* Тип кузова */}
-                  <div className="mb-8">
-                    <Label className="text-slate-700 font-medium mb-4 block">
-                      Тип кузова
-                    </Label>
-                    <BodyTypeSelector
-                      selected={filters.bodyType}
-                      onSelect={(value: string) =>
-                        handleFilterChange("bodyType", value)
-                      }
-                    />
-                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                    {/* Тип кузова */}
+                                        <div className="space-y-2">
+                                          <Label className="text-slate-700 font-medium">
+                                            Тип кузова
+                                          </Label>
+                                          <Select
+                                            value={filters.bodyType || ""}
+                                            onValueChange={(value: string) =>
+                                              handleFilterChange("bodyType", value)
+                                            }
+                                          >
+                                            <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
+                                              <SelectValue placeholder="Оберіть тип" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="All">Всі типи</SelectItem>
+                                              <SelectItem value="Седан">Седан</SelectItem>
+                                              <SelectItem value="Кросовер">Кросовер</SelectItem>
+                                              <SelectItem value="Купе">Купе</SelectItem>
+                                              <SelectItem value="Універсал">Універсал</SelectItem>
+                                              <SelectItem value="Хетчбек">Хетчбек</SelectItem>
+                                              <SelectItem value="Мінівен">Мінівен</SelectItem>
+                                              <SelectItem value="Ліфтбек">Ліфтбек</SelectItem>
+                                              <SelectItem value="Мікроавтобус">Мікроавтобус</SelectItem>
+                                              <SelectItem value="Пікап">Пікап</SelectItem>
+                                              <SelectItem value="Кабріолет">Кабріолет</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                     {/* Тип пального */}
                     <div className="space-y-2">
                       <Label className="text-slate-700 font-medium">
@@ -902,7 +920,7 @@ export default function PriceYears() {
                           (!filters2.brand || !filters2.model)) ||
                         !!error
                       }
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                     >
                       <Search className="w-4 h-4 mr-2" />
                       Перевірити ціни

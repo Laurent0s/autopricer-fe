@@ -115,7 +115,7 @@ export default function BudgetFinderPage() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSearch = useCallback(async () => {
+  const handleSearch = useCallback(async (pageArg?: number) => {
     setIsSearching(true);
     setResults([]);
     if(!filters?.price) {
@@ -125,7 +125,7 @@ export default function BudgetFinderPage() {
     const data = await dispatch(
       fetchBudget({
         price: filters?.price ?? 0,
-        page: page,
+        page: pageArg ?? page,
         limit: limit,
         brand: filters?.brand ?? null,
         model: filters?.model ?? null,
@@ -319,7 +319,7 @@ export default function BudgetFinderPage() {
                   <Button
                     suppressHydrationWarning
                     variant="ghost"
-                    className="text-slate-700 hover:bg-white/50 p-2 h-auto text-sm font-medium"
+                    className="text-slate-700 hover:bg-white/50 p-2 h-auto text-sm font-medium cursor-pointer"
                   >
                     <span className="mr-2">Додаткові параметри</span>
                     {showAdvanced ? (
@@ -334,6 +334,7 @@ export default function BudgetFinderPage() {
               <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                 <div className="flex items-center space-x-3">
                   <Switch
+                    className="cursor-pointer"
                     id="exclude-usa"
                     checked={excludeUSA}
                     onCheckedChange={setExcludeUSA}
@@ -349,10 +350,9 @@ export default function BudgetFinderPage() {
                   <Button
                     suppressHydrationWarning
                     onClick={() => {
-                      setPage(1);
-                      handleSearch();
+                      handleSearch(1);
                     }}
-                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                   >
                     <Search className="w-4 h-4 mr-2" />
                     Підібрати авто
@@ -370,20 +370,37 @@ export default function BudgetFinderPage() {
                   Додаткові параметри
                 </h4>
 
-                {/* Тип кузова */}
-                <div className="mb-8">
-                  <Label className="text-slate-700 font-medium mb-4 block">
-                    Тип кузова
-                  </Label>
-                  <BodyTypeSelector
-                    selected={filters?.bodyType}
-                    onSelect={(value: string) =>
-                      handleFilterChange("bodyType", value)
-                    }
-                  />
-                </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                  {/* Тип кузова */}
+                                      <div className="space-y-2">
+                                        <Label className="text-slate-700 font-medium">
+                                          Тип кузова
+                                        </Label>
+                                        <Select
+                                          value={filters?.bodyType || ""}
+                                          onValueChange={(value: string) =>
+                                            handleFilterChange("bodyType", value)
+                                          }
+                                        >
+                                          <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
+                                            <SelectValue placeholder="Оберіть тип" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="All">Всі типи</SelectItem>
+                                            <SelectItem value="Седан">Седан</SelectItem>
+                                            <SelectItem value="Кросовер">Кросовер</SelectItem>
+                                            <SelectItem value="Купе">Купе</SelectItem>
+                                            <SelectItem value="Універсал">Універсал</SelectItem>
+                                            <SelectItem value="Хетчбек">Хетчбек</SelectItem>
+                                            <SelectItem value="Мінівен">Мінівен</SelectItem>
+                                            <SelectItem value="Ліфтбек">Ліфтбек</SelectItem>
+                                            <SelectItem value="Мікроавтобус">Мікроавтобус</SelectItem>
+                                            <SelectItem value="Пікап">Пікап</SelectItem>
+                                            <SelectItem value="Кабріолет">Кабріолет</SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                   {/* Тип пального */}
                   <div className="space-y-2">
                     <Label className="text-slate-700 font-medium">
@@ -515,10 +532,9 @@ export default function BudgetFinderPage() {
                   <Button
                     suppressHydrationWarning
                     onClick={() => {
-                      setPage(1);
-                      handleSearch();
+                      handleSearch(1);
                     }}
-                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                   >
                     <Search className="w-4 h-4 mr-2" />
                     Підібрати авто

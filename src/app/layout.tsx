@@ -12,6 +12,8 @@ import {
 import "./globals.css";
 import Link from "next/link";
 import StoreProvider from "./StoreProvider";
+import NavLink from "@/components/layout/NavBar";
+import NavBar from "@/components/layout/NavBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -78,18 +80,7 @@ export default function RootLayout({
                   </div>
                 </Link>
 
-                <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={`flex items-center space-x-2 px-2 py-2 lg:px-3 rounded-xl transition-all duration-200 text-sm font-medium`}
-                    >
-                      <link.icon className="w-4 h-4" />
-                      <span>{link.label}</span>
-                    </Link>
-                  ))}
-                </nav>
+                <NavBar />
               </div>
             </div>
           </header>

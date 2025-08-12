@@ -32,9 +32,9 @@ export default function MetricsCards({ data, data2 }) {
     },
     {
       title: "Медіанна ціна",
-      value: `$${data.medianPrice?.toLocaleString("de-DE") || "0"}`,
+      value: `$${data.medianPrice?.toLocaleString() || "0"}`,
       value2: data2
-        ? `$${data2.medianPrice?.toLocaleString("de-DE") || "0"}`
+        ? `$${data2.medianPrice?.toLocaleString() || "0"}`
         : null,
       icon: BarChart,
       color: "from-emerald-500 to-emerald-600",
