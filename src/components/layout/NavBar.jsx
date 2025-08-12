@@ -18,7 +18,7 @@ export default function NavBar() {
   const [showWindow, setShowWindow] = useState(false);
 
   return (
-    <div style={{background: showWindow ? 'white' : 'none'}} className="flex h-screen z-10 w-full left-0 fixed top-0 overflow-auto justify-center md:relative md:justify-end md:bg-transparent md:h-16">
+    <div style={{background: showWindow ? 'white' : 'none'}} className={`${showWindow ? 'h-screen' : 'h-16'} flex z-10 w-full left-0 fixed top-0 overflow-auto justify-center md:relative md:justify-end md:bg-transparent md:h-16`}>
       <div className="fixed right-2 top-2 md:hidden">
         <Hamburger onToggle={() => setShowWindow((prev) => !prev)}/>
       </div>
