@@ -37,7 +37,7 @@ export default function CarResultCard({ car, handleAnalysisSearch }) {
     yearTo: yearTo ?? null,
     bodyType: car.bodyType ?? null,
     fuel: fuel ?? null,
-    transmission: transition ?? null,
+    transmission: transmission ?? null,
     driveType: car.driveType ?? null,
   };
   return (
