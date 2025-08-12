@@ -8,6 +8,20 @@ export default function CarResultCard({ car, handleAnalysisSearch }) {
   let years = [];
   let yearfrom = '';
   let yearTo = '';
+  let fuel = '';
+  let transmission = '';
+
+  if(car.fuel.includes(',')) {
+    fuel = car.fuel.split(',')[0];
+  } else {
+    fuel = car.fuel;
+  }
+
+  if(car.transmission.includes(',')) {
+    transmission = car.transmission.split(',')[0];
+  } else {
+    transmission = car.transmission;
+  }
 
   if(car.years.includes('-')) {
     years = car.years.split('-');
@@ -22,8 +36,8 @@ export default function CarResultCard({ car, handleAnalysisSearch }) {
     yearfrom: yearfrom ?? null,
     yearTo: yearTo ?? null,
     bodyType: car.bodyType ?? null,
-    fuel: car.fuel.split(',')[0] ?? null,
-    transmission: car.transmission.split(',')[0] ?? null,
+    fuel: fuel ?? null,
+    transmission: transition ?? null,
     driveType: car.driveType ?? null,
   };
   return (

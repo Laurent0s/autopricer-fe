@@ -122,6 +122,9 @@ export default function BudgetFinderPage() {
       setIsSearching(false);
       return null;
     }
+    if(pageArg) {
+      setPage(1);
+    }
     const data = await dispatch(
       fetchBudget({
         price: filters?.price ?? 0,
