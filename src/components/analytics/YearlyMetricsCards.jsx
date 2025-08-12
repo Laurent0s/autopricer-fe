@@ -44,7 +44,7 @@ export default function YearlyMetricsCards({
         >
           <Card className="relative border-0 shadow-lg hover:shadow-xl transition-all duration-300 group h-full">
             <div
-              className={`absolute inset-0 bg-gradient-to-br ${metric.color} opacity-5 group-hover:opacity-10 transition-opacity`}
+              className={`absolute inset-0 bg-gradient-to-br ${metric.color} opacity-5 group-hover:opacity-10 transition-opacity rounded-xl`}
             />
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">

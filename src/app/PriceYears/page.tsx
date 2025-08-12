@@ -490,7 +490,7 @@ export default function PriceYears() {
               <RotateCcw className="w-4 h-4" />
               <span>Скинути</span>
             </Button>
-            <Button onClick={handleShare} className="w-36 cursor-pointer">
+            {/* <Button onClick={handleShare} className="w-36 cursor-pointer">
               {isCopied ? (
                 <>
                   <Check className="w-4 h-4 mr-2" />
@@ -502,7 +502,7 @@ export default function PriceYears() {
                   <span>Поділитися</span>
                 </>
               )}
-            </Button>
+            </Button> */}
           </div>
         </motion.div>
 

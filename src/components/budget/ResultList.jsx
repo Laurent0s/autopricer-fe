@@ -104,7 +104,7 @@ export default function ResultList({
               </PaginationItem>
             ) : null}
             <PaginationItem>
-              <PaginationLink href="#">{page}</PaginationLink>
+              <PaginationLink href="#" isActive={true} className="hover:bg-blue-100 hover:text-blue-700">{page}</PaginationLink>
             </PaginationItem>
             {page === pagemax - 1 ? (
               <PaginationItem
