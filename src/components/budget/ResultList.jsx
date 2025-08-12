@@ -27,10 +27,11 @@ export default function ResultList({
   handleSpecific,
   handleModelsNumber,
   handleAnalysisSearch,
+  limit,
   page,
-  pagemax,
-  totalOffers,
+  totalOffers
 }) {
+  const pagemax = Math.ceil(totalOffers / limit);
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -41,7 +42,7 @@ export default function ResultList({
         <div className="flex items-center gap-2">
           <ListFilter className="w-4 h-4 text-slate-500" />
           <Label>Моделей на сторінці:</Label>
-          <Select defaultValue="10" onValueChange={(value) => {handleModelsNumber(value)}}>
+          <Select value={String(limit)} onValueChange={(value) => {handleModelsNumber(value)}}>
             <SelectTrigger className="w-[180px]">
               <SelectValue />
             </SelectTrigger>

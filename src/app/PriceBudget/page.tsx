@@ -184,6 +184,7 @@ export default function BudgetFinderPage() {
   };
 
   const handleModelsNumber = (value: string) => {
+    setPage(1);
     setLimit(Number(value));
   }
 
@@ -566,8 +567,8 @@ export default function BudgetFinderPage() {
                 handleSpecific={handleSpecific}
                 handleModelsNumber={handleModelsNumber}
                 handleAnalysisSearch={handleAnalysisSearch}
+                limit={limit}
                 page={page}
-                pagemax={Math.ceil(totalOffers / limit)}
                 totalOffers={totalOffers}
               />
             </div>
