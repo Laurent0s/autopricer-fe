@@ -11,19 +11,19 @@ export default function CarResultCard({ car, handleAnalysisSearch }) {
   let fuel = '';
   let transmission = '';
 
-  if(car.fuel.includes(',')) {
+  if(car.fuel && car.fuel.includes(',')) {
     fuel = car.fuel.split(',')[0];
   } else {
     fuel = car.fuel;
   }
 
-  if(car.transmission.includes(',')) {
+  if(car.transmission && car.transmission.includes(',')) {
     transmission = car.transmission.split(',')[0];
   } else {
     transmission = car.transmission;
   }
 
-  if(car.years.includes('-')) {
+  if(car.years && car.years.includes('-')) {
     years = car.years.split('-');
     yearfrom = years[0];
     yearTo = years[1];
