@@ -35,6 +35,7 @@ import YearlyPriceChart from "@/components/analytics/YearlyPriceChart";
 import YearlyMetricsCards from "@/components/analytics/YearlyMetricsCards";
 import { useAppDispatch } from "@/store/hooks";
 import { fetchPriceYears } from "@/store/slices/PriceYearsSlice";
+import { Card, CardContent } from "@/components/ui/card";
 
 const CAR_DATA = {
   Audi: ["A4", "A6", "Q5", "Q7", "A3"],
@@ -932,7 +933,7 @@ export default function PriceYears() {
           </div>
         </motion.div>
 
-        {data && (
+        {data ? (
           <>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -976,6 +977,13 @@ export default function PriceYears() {
               />
             </motion.div>
           </>
+        ) : (
+          <Card className="h-72 flex flex-col justify-center items-center shadow-lg">
+            <CardContent>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-2">
+              Почніть пошук, щоб переглянути дані.
+            </h2></CardContent>
+          </Card>
         )}
       </div>
     </div>

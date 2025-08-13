@@ -25,6 +25,7 @@ import ResultList from "@/components/budget/ResultList";
 import { useAppDispatch } from "@/store/hooks";
 import { fetchBudget, PriceBudgetsCar } from "@/store/slices/PriceBudgetSlice";
 import { useRouter } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
 
 const CAR_DATA = {
   Audi: ["A4", "A6", "Q5", "Q7", "A3"],
@@ -553,7 +554,7 @@ export default function BudgetFinderPage() {
           <div className="text-center p-8">Завантаження результатів...</div>
         )}
 
-        {results.length > 0 && (
+        {results.length > 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -576,6 +577,13 @@ export default function BudgetFinderPage() {
               />
             </div>
           </motion.div>
+        ) : (
+          <Card className="h-72 flex flex-col justify-center items-center shadow-lg">
+            <CardContent>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-2">
+              Почніть пошук, щоб переглянути дані.
+            </h2></CardContent>
+          </Card>
         )}
       </div>
     </div>

@@ -20,7 +20,7 @@ export default function NavBar() {
   return (
     <div style={{background: showWindow ? 'white' : 'none'}} className={`${showWindow ? 'h-screen' : 'h-16'} flex z-10 w-full left-0 fixed top-0 overflow-auto justify-center md:relative md:justify-end md:bg-transparent md:h-16`}>
       <div className="fixed right-2 top-2 md:hidden">
-        <Hamburger onToggle={() => setShowWindow((prev) => !prev)}/>
+        <Hamburger toggled={showWindow} onToggle={() => setShowWindow((prev) => !prev)} color="#6e6d6d" rounded/>
       </div>
       <nav className={`${showWindow ? 'flex' : 'hidden'} flex-col md:flex items-center justify-center gap-2 md:flex-row`}>
         {navLinks.map(({ href, label, icon: Icon }) => {

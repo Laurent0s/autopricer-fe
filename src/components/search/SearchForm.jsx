@@ -110,8 +110,8 @@ export default function SearchForm({ onSearch }) {
   const isFormValid = filters.brand && filters.model && !error;
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
-      <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
+    <div className="fflex flex-col grow">
+      <Card className="border-0 shadow-none">
         <CardContent className="p-8 md:p-12">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl mb-4">
@@ -132,7 +132,7 @@ export default function SearchForm({ onSearch }) {
             </Alert>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             {/* Марка */}
             <div className="space-y-2">
               <Label className="text-slate-700 font-medium flex items-center gap-2">

@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import SearchForm from "../components/search/SearchForm";
+import MarketStats from '@/components/analytics/MarketStats';
 import {
   Clock,
   CheckCircle,
@@ -139,8 +140,12 @@ export default function Home() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-          >
+          > 
+          <div className="grid grid-cols-2 gap-8 border-0 shadow-2xl bg-white/95 rounded-xl">
             <SearchForm onSearch={""} />
+
+            <MarketStats />
+          </div>
           </motion.div>
         </div>
       </section>

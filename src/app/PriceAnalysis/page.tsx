@@ -28,7 +28,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-
+import { Card, CardContent } from "@/components/ui/card";
 import MetricsCards from "@/components/analytics/MetricsCards";
 import PriceDistributionChart from "@/components/analytics/PriceDistributionChart";
 import SearchSummary from "@/components/analytics/SearchSummary";
@@ -933,6 +933,15 @@ export default function PriceAnalysisPage() {
             filters2={isCompareMode ? filters2 : null}
           />
         </motion.div>
+
+        {!data && (
+          <Card className="h-72 flex flex-col justify-center items-center shadow-lg">
+            <CardContent>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-2">
+              Почніть пошук, щоб переглянути дані.
+            </h2></CardContent>
+          </Card>
+        )}
 
         {/* Metrics Cards */}
         {data && (

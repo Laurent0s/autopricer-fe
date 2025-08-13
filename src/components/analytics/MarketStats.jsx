@@ -26,7 +26,7 @@ const transmissionStats = [
   },
 ];
 
-const fuelStats = [
+const fuelStats1 = [
   {
     label: "Бензин",
     count: "136,711",
@@ -47,7 +47,10 @@ const fuelStats = [
     avgPrice: "6,460",
     color: "green",
     icon: Leaf,
-  },
+  }
+];
+
+const fuelStats2 = [
   {
     label: "Гібрид",
     count: "6,301",
@@ -62,7 +65,7 @@ const fuelStats = [
     color: "purple",
     icon: Bolt,
   },
-];
+]
 
 const colorClasses = {
   blue: { bg: "bg-blue-100", text: "text-blue-800", ring: "ring-blue-300" },
@@ -84,14 +87,8 @@ const colorClasses = {
 
 export default function MarketStats() {
   return (
-    <Card className="border-0 shadow-lg">
+    <Card className="bg-transparent border-0 shadow-none">
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-slate-800">
-          Статистика ринку
-        </CardTitle>
-        <CardDescription>
-          Єдині точні дані про ринок вживаних авто. Оновлюються щоденно
-        </CardDescription>
       </CardHeader>
       <CardContent className="p-6 space-y-8">
         {/* Transmission stats */}
@@ -121,17 +118,40 @@ export default function MarketStats() {
         </div>
 
         {/* Fuel stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {fuelStats.map((stat, index) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
+            {fuelStats1.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 + index * 0.05 }}
+                viewport={{ once: true }}
+              >
+                <div
+                  className={`flex flex-col flex-1 p-4 rounded-xl ring-1 ring-inset ${colorClasses[stat.color].bg} ${colorClasses[stat.color].ring} ${colorClasses[stat.color].text}`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <stat.icon className="w-4 h-4" />
+                    <p className="font-semibold text-sm">{stat.label}</p>
+                  </div>
+                  <p className="text-lg font-bold">{stat.count}</p>
+                  <p className="text-xs opacity-80">сер. ${stat.avgPrice}</p>
+                </div>
+              </motion.div>
+            ))}
+        </div>
+        <div className="grid grid-cols-6 sm:grid-cols-6 gap-5">
+            {fuelStats2.map((stat, index) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 + index * 0.05 }}
               viewport={{ once: true }}
+              style={{display: 'grid', flexDirection: 'column', flexGrow: '1', gridColumn: index == 0 ? "2/4" : "4/6" }}
             >
               <div
-                className={`p-4 rounded-xl ring-1 ring-inset ${colorClasses[stat.color].bg} ${colorClasses[stat.color].ring} ${colorClasses[stat.color].text}`}
+                className={`grid col-span-2 grow p-4 rounded-xl ring-1 ring-inset ${colorClasses[stat.color].bg} ${colorClasses[stat.color].ring} ${colorClasses[stat.color].text}`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <stat.icon className="w-4 h-4" />
@@ -142,7 +162,7 @@ export default function MarketStats() {
               </div>
             </motion.div>
           ))}
-        </div>
+          </div> 
       </CardContent>
     </Card>
   );
