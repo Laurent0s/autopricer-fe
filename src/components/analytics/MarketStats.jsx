@@ -159,6 +159,7 @@ export default function MarketStats() {
                 </div>
               </motion.div>
             ))}
+            <div className="md:hidden">
             {fuelStats3.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -179,8 +180,9 @@ export default function MarketStats() {
                 </div>
               </motion.div>
             ))}
+            </div>
         </div>
-        <div className="grid grid-cols-4 w-full gap-5">
+        <div className="md:hidden grid grid-cols-4 w-full gap-5">
             {fuelStats4.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -191,7 +193,7 @@ export default function MarketStats() {
                 style={{display: 'grid', flexDirection: 'column', flexGrow: '1', gridColumn: "2/4"}}
               >
                 <div
-                  className={`md:hidden flex flex-col flex-1 p-4 rounded-xl ring-1 ring-inset ${colorClasses[stat.color].bg} ${colorClasses[stat.color].ring} ${colorClasses[stat.color].text}`}
+                  className={`flex flex-col flex-1 p-4 rounded-xl ring-1 ring-inset ${colorClasses[stat.color].bg} ${colorClasses[stat.color].ring} ${colorClasses[stat.color].text}`}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <stat.icon className="w-4 h-4" />
