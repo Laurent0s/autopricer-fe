@@ -36,34 +36,7 @@ import BodyTypeSelector from "@/components/search/BodyTypeSelector";
 import RangeSlider from "@/components/search/RangeSlider";
 import { useAppDispatch } from "@/store/hooks";
 import { fetchPriceAnalysis } from "@/store/slices/PriceAnalysisSlice";
-
-const CAR_DATA = {
-  Audi: ["A4", "A6", "Q5", "Q7", "A3"],
-  BMW: ["3 Series", "5 Series", "X3", "X5", "i3"],
-  Chevrolet: ["Cruze", "Malibu", "Equinox", "Camaro", "Aveo"],
-  Citroen: ["C3", "C4", "C5 Aircross", "Berlingo"],
-  Daewoo: ["Lanos", "Nexia", "Matiz"],
-  Ford: ["Focus", "Fiesta", "Mondeo", "Kuga", "Fusion"],
-  Honda: ["Civic", "Accord", "CR-V", "Pilot", "HR-V"],
-  Hyundai: ["Sonata", "Elantra", "Tucson", "Santa Fe", "Accent"],
-  Jeep: ["Grand Cherokee", "Wrangler", "Compass", "Renegade"],
-  Kia: ["Sportage", "Ceed", "Rio", "Optima"],
-  Mazda: ["3", "6", "CX-5", "CX-9"],
-  "Mercedes-Benz": ["C-Class", "E-Class", "S-Class", "GLC", "GLE"],
-  Mitsubishi: ["Outlander", "Lancer", "ASX", "Pajero Sport"],
-  Nissan: ["Qashqai", "X-Trail", "Juke", "Leaf", "Rogue"],
-  Opel: ["Astra", "Corsa", "Insignia", "Mokka"],
-  Peugeot: ["208", "308", "3008", "5008", "Partner"],
-  Porsche: ["Cayenne"],
-  Renault: ["Megane", "Clio", "Duster", "Logan", "Captur"],
-  Skoda: ["Octavia", "Superb", "Fabia", "Kodiaq"],
-  Tesla: ["Model 3", "Model S", "Model X", "Model Y"],
-  Toyota: ["Camry", "Corolla", "RAV4", "Land Cruiser Prado", "Highlander"],
-  Volkswagen: ["Passat", "Golf", "Tiguan", "Jetta", "Polo", "Touareg"],
-  Volvo: ["XC90", "XC60", "S60", "V60"],
-  ВАЗ: ["21099", "2107", "2106", "2110", "Priora"],
-  ЗАЗ: ["Sens", "Lanos", "Forza", "Vida", "Tavria"],
-} as const;
+import CAR_DATA from "../../../public/data/cars.json";
 
 type ModelData = {
   averagePrice: number;
@@ -75,7 +48,7 @@ type ModelData = {
 };
 
 type RangeTuple = number[];
-type fuel = "Бензин" | "Дизель" | "гібрид" | "електро" | "All";
+type fuel = "Бензин" | "Дизель" | "гібрид" | "електро" | "All" | "Газ";
 type transmissionType = "Механіка" | "Автомат" | "Робот" | "Варіатор" | "All";
 type driveType = "fwd" | "rwd" | "awd" | "All";
 
@@ -795,6 +768,9 @@ export default function PriceAnalysisPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="All">Всі типи</SelectItem>
+                          <SelectItem value="Газ">Газ</SelectItem>
+                          <SelectItem value="Газ метан / Бензин">Газ метан / Бензин</SelectItem>
+                          <SelectItem value="Газ пропан-бутан / Бензин">Газ пропан-бутан / Бензин</SelectItem>
                           <SelectItem value="Бензин">Бензин</SelectItem>
                           <SelectItem value="Дизель">Дизель</SelectItem>
                           <SelectItem value="Гібрид">Гібрид</SelectItem>

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { CAR_DATA } from "@/types/CarData";
+import CAR_DATA from "../../../public/data/cars.json";
 import { api } from "@/lib/api";
 import axios from "axios";
 

@@ -126,6 +126,9 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
                       </SelectTrigger>
                       <SelectContent suppressHydrationWarning>
                         <SelectItem value="All">Всі типи</SelectItem>
+                        <SelectItem value="Газ">Газ</SelectItem>
+                        <SelectItem value="Газ метан / Бензин">Газ метан / Бензин</SelectItem>
+                        <SelectItem value="Газ пропан-бутан / Бензин">Газ пропан-бутан / Бензин</SelectItem>
                         <SelectItem value="Бензин">Бензин</SelectItem>
                         <SelectItem value="Дизель">Дизель</SelectItem>
                         <SelectItem value="Гібрид">Гібрид</SelectItem>
