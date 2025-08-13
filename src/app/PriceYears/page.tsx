@@ -978,12 +978,19 @@ export default function PriceYears() {
             </motion.div>
           </>
         ) : (
-          <Card className="h-72 flex flex-col justify-center items-center shadow-lg">
-            <CardContent>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-2">
-              Почніть пошук, щоб переглянути дані.
-            </h2></CardContent>
-          </Card>
+          <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="mb-8"
+                    >
+                      <Card className="h-72 flex flex-col justify-center items-center shadow-lg">
+                        <CardContent>
+                          <h2 className="text-2xl md:text-3xl font-bold text-slate-500 mb-2">
+                          Почніть пошук, щоб переглянути дані.
+                        </h2></CardContent>
+                      </Card>
+                    </motion.div>
         )}
       </div>
     </div>
