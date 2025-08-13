@@ -37,6 +37,7 @@ import RangeSlider from "@/components/search/RangeSlider";
 import { useAppDispatch } from "@/store/hooks";
 import { fetchPriceAnalysis } from "@/store/slices/PriceAnalysisSlice";
 import CAR_DATA from "../../../public/data/cars.json";
+import Link from "next/link";
 
 type ModelData = {
   averagePrice: number;
@@ -427,13 +428,15 @@ export default function PriceAnalysisPage() {
           className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8"
         >
           <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              size="icon"
-              className="hover:bg-blue-50 hover:border-blue-300 flex-shrink-0"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
+            <Link href='/'>
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-blue-50 hover:border-blue-300 flex-shrink-0"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+            </Link>
             <div className="flex-1">
               <h1 className="text-3xl md:text-4xl font-bold text-slate-800">
                 Аналіз цін та пропозиції на ринку
@@ -620,7 +623,7 @@ export default function PriceAnalysisPage() {
                           handleFilterChange2("brand", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white">
+                        <SelectTrigger className="w-full h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white">
                           <SelectValue placeholder="Оберіть марку" />
                         </SelectTrigger>
                         <SelectContent>
@@ -643,7 +646,7 @@ export default function PriceAnalysisPage() {
                         }
                         disabled={!filters2.brand}
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white">
+                        <SelectTrigger className="w-full h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white">
                           <SelectValue placeholder="Оберіть модель" />
                         </SelectTrigger>
                         <SelectContent>
@@ -696,13 +699,6 @@ export default function PriceAnalysisPage() {
                   {!showAdvanced && ( // Only show search button here if advanced filters are not open
                     <Button
                       onClick={handleSearch}
-                      disabled={
-                        !filters.brand ||
-                        !filters.model ||
-                        (isCompareMode &&
-                          (!filters2.brand || !filters2.model)) ||
-                        !!error
-                      }
                       className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                     >
                       <Search className="w-4 h-4 mr-2" />
@@ -878,13 +874,6 @@ export default function PriceAnalysisPage() {
                   <div className="flex justify-center">
                     <Button
                       onClick={handleSearch}
-                      disabled={
-                        !filters.brand ||
-                        !filters.model ||
-                        (isCompareMode &&
-                          (!filters2.brand || !filters2.model)) ||
-                        !!error
-                      }
                       className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                     >
                       <Search className="w-4 h-4 mr-2" />

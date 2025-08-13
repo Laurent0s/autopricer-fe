@@ -79,14 +79,16 @@ export default function YearlyPriceChart({ data, data2, filters, filters2 }) {
           <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg">
             <Calendar className="w-5 h-5 text-white" />
           </div>
+          <div className="flex flex-col">
           <span>Порівняння цін по роках</span>
+            <p className="text-blue-700">{filters.brand} {filters.model}</p>
+            {
+              filters2.brand && filters2.model && (
+              <p className="text-[#f43f5e]">{filters2.brand} {filters2.model}</p>
+              )
+            }
+          </div>
         </CardTitle>
-        <p className="text-blue-700">{filters.brand} {filters.model}</p>
-        {
-          filters2.brand && filters2.model && (
-            <p className="text-[#f43f5e]">{filters2.brand} {filters2.model}</p>
-          )
-        }
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={400}>

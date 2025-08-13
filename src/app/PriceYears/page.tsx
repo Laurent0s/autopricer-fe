@@ -632,7 +632,7 @@ export default function PriceYears() {
                           handleFilterChange2("brand", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white">
+                        <SelectTrigger className="w-full h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white">
                           <SelectValue placeholder="Оберіть марку" />
                         </SelectTrigger>
                         <SelectContent>
@@ -655,7 +655,7 @@ export default function PriceYears() {
                         }
                         disabled={!filters2.brand}
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white">
+                        <SelectTrigger className="w-full h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white">
                           <SelectValue placeholder="Оберіть модель" />
                         </SelectTrigger>
                         <SelectContent>
@@ -708,13 +708,6 @@ export default function PriceYears() {
                   {!showAdvanced && ( // Only show search button here if advanced filters are not open
                     <Button
                       onClick={handleSearch}
-                      disabled={
-                        !filters.brand ||
-                        !filters.model ||
-                        (isCompareMode &&
-                          (!filters2.brand || !filters2.model)) ||
-                        !!error
-                      }
                       className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                     >
                       <Search className="w-4 h-4 mr-2" />
@@ -810,8 +803,8 @@ export default function PriceYears() {
                           <SelectItem value="Ручна / Механіка">
                             Ручна / Механіка
                           </SelectItem>
-                          <SelectItem value="Типтронік">Типтронік</SelectItem>
                           <SelectItem value="Автомат">Автомат</SelectItem>
+                          <SelectItem value="Типтронік">Типтронік</SelectItem>
                           <SelectItem value="Робот">Робот</SelectItem>
                           <SelectItem value="Варіатор">Варіатор</SelectItem>
                         </SelectContent>
@@ -890,13 +883,6 @@ export default function PriceYears() {
                   <div className="flex justify-center">
                     <Button
                       onClick={handleSearch}
-                      disabled={
-                        !filters.brand ||
-                        !filters.model ||
-                        (isCompareMode &&
-                          (!filters2.brand || !filters2.model)) ||
-                        !!error
-                      }
                       className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                     >
                       <Search className="w-4 h-4 mr-2" />

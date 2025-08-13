@@ -34,6 +34,7 @@ export default function SearchSummary({ filters, filters2 }) {
       model: "Модель",
       yearfrom: "Рік від",
       yearTo: "Рік до",
+      fuel: "Пальне",
       engineType: "Двигун",
       transmission: "КПП",
       bodyType: "Кузов",

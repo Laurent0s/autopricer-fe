@@ -17,8 +17,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import BodyTypeSelector from "@/components/search/BodyTypeSelector";
 import RangeSlider from "@/components/search/RangeSlider";
 import FilterSidebar from "@/components/budget/FilterSidebar";
 import ResultList from "@/components/budget/ResultList";
@@ -63,7 +64,7 @@ export type SearchFilters = Partial<SearchFilterMap>;
 type SearchFilterKey = keyof SearchFilterMap;
 
 export default function BudgetFinderPage() {
-  const [filters, setFilters] = useState<SearchFilters>();
+  const [filters, setFilters] = useState<SearchFilters>({});
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [excludeUSA, setExcludeUSA] = useState(false);
   const [results, setResults] = useState<PriceBudgetsCar[]>([]);
@@ -71,6 +72,8 @@ export default function BudgetFinderPage() {
   const [page, setPage] = useState<number>(1);
   const [totalOffers, setTotalOffers] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
+  const [error, setError] = useState("");
+  const [found, setFound] = useState(0);
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -87,16 +90,25 @@ export default function BudgetFinderPage() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSearch = useCallback(async (pageArg?: number) => {
+  const handleSearch = (pageArg?: number, clicked?: boolean) => {
     setIsSearching(true);
+    setError("");
     setResults([]);
-    if(!filters?.price) {
+    if(!filters.price && clicked) {
+      setError('Будь ласка оберіть ваш бюджет');
       setIsSearching(false);
       return null;
     }
     if(pageArg) {
       setPage(1);
     }
+    loadData(page);
+    setIsSearching(false);
+  };
+
+  const loadData = useCallback(async (pageArg?: number) => {
+    setError("");
+    setFound((prev) => prev + 1);
     const data = await dispatch(
       fetchBudget({
         price: filters?.price ?? 0,
@@ -107,14 +119,14 @@ export default function BudgetFinderPage() {
         ifusa: excludeUSA,
         yearfrom: filters?.yearfrom ?? null,
         yearTo: filters?.yearTo ?? null,
-        bodyType: filters.bodyType === "All" ? null : (filters.bodyType ?? null),
-        fuel: filters.fuel === "All" ? null : (filters.fuel ?? null),
-        transmission: filters.transmission === "All"
+        bodyType: filters?.bodyType === "All" ? null : (filters?.bodyType ?? null),
+        fuel: filters?.fuel === "All" ? null : (filters?.fuel ?? null),
+        transmission: filters?.transmission === "All"
               ? null
-              : (filters.transmission ?? null),
-        driveType: filters.driveType === "All"
+              : (filters?.transmission ?? null),
+        driveType: filters?.driveType === "All"
               ? null
-              : (filters.driveType ?? null),
+              : (filters?.driveType ?? null),
         mileageFrom: filters?.mileageFrom ?? null,
         mileageTo: filters?.mileageTo ?? null,
         engineFrom: filters?.engineFrom ?? null,
@@ -123,7 +135,6 @@ export default function BudgetFinderPage() {
     ).unwrap();
     setResults(data.data);
     setTotalOffers(Number(data.totalOffers));
-    setIsSearching(false);
   }, [dispatch,filters, page, limit]);
 
   useEffect(() => {
@@ -210,6 +221,13 @@ export default function BudgetFinderPage() {
               <Search className="w-5 h-5 mr-2 text-emerald-600" />
               Основні параметри пошуку
             </h3>
+
+            {error && (
+                <Alert variant="destructive" className="mb-6">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-6">
               {" "}
@@ -326,7 +344,7 @@ export default function BudgetFinderPage() {
                   <Button
                     suppressHydrationWarning
                     onClick={() => {
-                      handleSearch(1);
+                      handleSearch(1, true);
                     }}
                     className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                   >
@@ -429,8 +447,8 @@ export default function BudgetFinderPage() {
                         <SelectItem value="Ручна / Механіка">
                           Ручна / Механіка
                         </SelectItem>
-                        <SelectItem value="Типтронік">Типтронік</SelectItem>
                         <SelectItem value="Автомат">Автомат</SelectItem>
+                        <SelectItem value="Типтронік">Типтронік</SelectItem>
                         <SelectItem value="Робот">Робот</SelectItem>
                         <SelectItem value="Варіатор">Варіатор</SelectItem>
                       </SelectContent>
@@ -511,7 +529,7 @@ export default function BudgetFinderPage() {
                   <Button
                     suppressHydrationWarning
                     onClick={() => {
-                      handleSearch(1);
+                      handleSearch(1, true);
                     }}
                     className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                   >
@@ -528,7 +546,7 @@ export default function BudgetFinderPage() {
           <div className="text-center p-8">Завантаження результатів...</div>
         )}
 
-        {results.length > 0 ? (
+        {results.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -551,7 +569,9 @@ export default function BudgetFinderPage() {
               />
             </div>
           </motion.div>
-        ) : (
+        )}
+
+        {!!isSearching && (
           <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
