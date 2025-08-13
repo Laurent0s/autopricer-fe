@@ -141,7 +141,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           > 
-          <div className="grid grid-cols-2 gap-8 border-0 shadow-2xl bg-white/95 rounded-xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 md:gap-8 border-0 shadow-2xl bg-white/95 rounded-xl">
             <SearchForm onSearch={""} />
 
             <MarketStats />

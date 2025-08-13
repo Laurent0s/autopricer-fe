@@ -67,6 +67,26 @@ const fuelStats2 = [
   },
 ]
 
+const fuelStats3 = [
+  {
+    label: "Гібрид",
+    count: "6,301",
+    avgPrice: "28,950",
+    color: "teal",
+    icon: Zap,
+  }
+]
+
+const fuelStats4 = [
+  {
+    label: "Електро",
+    count: "15,985",
+    avgPrice: "22,270",
+    color: "purple",
+    icon: Bolt,
+  },
+]
+
 const colorClasses = {
   blue: { bg: "bg-blue-100", text: "text-blue-800", ring: "ring-blue-300" },
   slate: { bg: "bg-slate-100", text: "text-slate-800", ring: "ring-slate-300" },
@@ -139,8 +159,51 @@ export default function MarketStats() {
                 </div>
               </motion.div>
             ))}
+            {fuelStats3.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 + index * 0.05 }}
+                viewport={{ once: true }}
+              >
+                <div
+                  className={`md:hidden flex flex-col flex-1 p-4 rounded-xl ring-1 ring-inset ${colorClasses[stat.color].bg} ${colorClasses[stat.color].ring} ${colorClasses[stat.color].text}`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <stat.icon className="w-4 h-4" />
+                    <p className="font-semibold text-sm">{stat.label}</p>
+                  </div>
+                  <p className="text-lg font-bold">{stat.count}</p>
+                  <p className="text-xs opacity-80">сер. ${stat.avgPrice}</p>
+                </div>
+              </motion.div>
+            ))}
         </div>
-        <div className="grid grid-cols-6 sm:grid-cols-6 gap-5">
+        <div className="grid grid-cols-4 w-full gap-5">
+            {fuelStats4.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 + index * 0.05 }}
+                viewport={{ once: true }}
+                style={{display: 'grid', flexDirection: 'column', flexGrow: '1', gridColumn: "2/4"}}
+              >
+                <div
+                  className={`md:hidden flex flex-col flex-1 p-4 rounded-xl ring-1 ring-inset ${colorClasses[stat.color].bg} ${colorClasses[stat.color].ring} ${colorClasses[stat.color].text}`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <stat.icon className="w-4 h-4" />
+                    <p className="font-semibold text-sm">{stat.label}</p>
+                  </div>
+                  <p className="text-lg font-bold">{stat.count}</p>
+                  <p className="text-xs opacity-80">сер. ${stat.avgPrice}</p>
+                </div>
+              </motion.div>
+            ))}
+            </div>
+        <div className="hidden md:grid grid-cols-6 sm:grid-cols-6 gap-5">
             {fuelStats2.map((stat, index) => (
             <motion.div
               key={stat.label}
