@@ -14,7 +14,7 @@ export default function YearlyMetricsCards({
   console.log(averagePriceFrom1);
   const metrics = [
     {
-      title: "Діапазон середніх цін",
+      title: "Діапазон цін",
       value: `$${averagePriceFrom1} - $${averagePriceTo1}`,
       value2:
         averagePriceFrom2 && averagePriceTo2
