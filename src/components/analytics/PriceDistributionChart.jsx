@@ -107,18 +107,20 @@ export default function PriceDistributionChart({
   return (
     <Card className="border-0 shadow-lg">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center space-x-2 text-xl text-slate-800">
+        <CardTitle className="flex items-start space-x-2 text-xl text-slate-800">
           <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg">
             <BarChart3 className="w-5 h-5 text-white" />
           </div>
-          <span>Розподіл цін за кількістю пропозицій</span>
+          <div className="flex flex-col">
+            <span>Розподіл цін за кількістю пропозицій</span>
+            <p className="text-blue-700 text-lg">{filters.brand} {filters.model}</p>
+          {
+            filters2.brand && filters2.model && (
+              <p className="text-[#f43f5e] text-lg">{filters2.brand} {filters2.model}</p>
+            )
+          }
+        </div>
         </CardTitle>
-        <p className="text-blue-700">{filters.brand} {filters.model}</p>
-        {
-          filters2.brand && filters2.model && (
-            <p className="text-[#f43f5e]">{filters2.brand} {filters2.model}</p>
-          )
-        }
       </CardHeader>
       <CardContent>
         <div className="w-full overflow-x-auto pb-4">

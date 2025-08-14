@@ -101,11 +101,11 @@ export default function MetricsCards({ data, data2 }) {
                     </div>
                   )}
                 </div>
-                <p className="text-2xl md:text-3xl font-bold text-slate-800">
+                <p className="text-xl font-bold text-slate-800">
                   {metric.value}
                 </p>
                 {metric.value2 && (
-                  <p className="text-xl md:text-2xl font-bold text-rose-500">
+                  <p className="text-xl font-bold text-rose-500">
                     {metric.value2}
                   </p>
                 )}
