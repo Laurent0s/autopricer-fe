@@ -78,8 +78,8 @@ export default function AdvancedFilters({ filters, onFilterChange, onReset }) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={null}>Всі типи</SelectItem>
+              <SelectItem value="Автомат">Автомат</SelectItem>
               <SelectItem value="механіка">Механіка</SelectItem>
-              <SelectItem value="автомат">Автомат</SelectItem>
               <SelectItem value="робот">Робот</SelectItem>
             </SelectContent>
           </Select>

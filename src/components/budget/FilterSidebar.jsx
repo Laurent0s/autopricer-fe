@@ -14,7 +14,7 @@ import { Search } from "lucide-react";
 
 export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, years, engineDraft, setEngineDraft, handleSearch, setPage, setFilters}) {
   return (
-    <Card className="sticky top-24 shadow-lg border-0">
+    <Card className="top-24 shadow-lg border-0">
       <CardHeader>
         <CardTitle className="text-lg">Фільтри</CardTitle>
       </CardHeader>
@@ -27,7 +27,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
             handleFilterChange("brand", value)
             }
             >
-            <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full">
+            <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full cursor-pointer">
               <SelectValue placeholder="Оберіть марку" />
             </SelectTrigger>
             <SelectContent>
@@ -46,7 +46,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
                     }
                     disabled={!filters.brand}
                   >
-                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full">
+                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full cursor-pointer">
                       <SelectValue placeholder="Оберіть модель" />
                     </SelectTrigger>
                     <SelectContent>
@@ -70,7 +70,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
                   >
                     <SelectTrigger
                       suppressHydrationWarning
-                      className=" border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20 w-full"
+                      className=" border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20 w-full cursor-pointer"
                     >
                       <SelectValue placeholder="Від року" />
                     </SelectTrigger>
@@ -94,7 +94,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
                   >
                     <SelectTrigger
                       suppressHydrationWarning
-                      className="h-12 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20 w-full"
+                      className="h-12 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20 w-full cursor-pointer"
                     >
                       <SelectValue placeholder="До року" />
                     </SelectTrigger>
@@ -120,7 +120,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
                     >
                       <SelectTrigger
                         suppressHydrationWarning
-                        className="h-11 border-slate-300 focus:border-emerald-500 w-full"
+                        className="h-11 border-slate-300 focus:border-emerald-500 w-full cursor-pointer"
                       >
                         <SelectValue placeholder="Оберіть тип" />
                       </SelectTrigger>
@@ -147,16 +147,16 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
                     >
                       <SelectTrigger
                         suppressHydrationWarning
-                        className="h-11 border-slate-300 focus:border-emerald-500 w-full"
+                        className="h-11 border-slate-300 focus:border-emerald-500 w-full cursor-pointer"
                       >
                         <SelectValue placeholder="Оберіть тип" />
                       </SelectTrigger>
                       <SelectContent suppressHydrationWarning>
                         <SelectItem value="All">Всі типи</SelectItem>
+                        <SelectItem value="Автомат">Автомат</SelectItem>
                         <SelectItem value="Ручна / Механіка">
                           Ручна / Механіка
                         </SelectItem>
-                        <SelectItem value="Автомат">Автомат</SelectItem>
                         <SelectItem value="Типтронік">Типтронік</SelectItem>
                         <SelectItem value="Робот">Робот</SelectItem>
                         <SelectItem value="Варіатор">Варіатор</SelectItem>
@@ -174,7 +174,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
                     >
                       <SelectTrigger
                         suppressHydrationWarning
-                        className="h-11 border-slate-300 focus:border-emerald-500 w-full"
+                        className="h-11 border-slate-300 focus:border-emerald-500 w-full cursor-pointer"
                       >
                         <SelectValue placeholder="Оберіть тип" />
                       </SelectTrigger>
@@ -197,7 +197,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
                     >
                       <SelectTrigger
                         suppressHydrationWarning
-                        className="h-11 border-slate-300 focus:border-emerald-500 w-full"
+                        className="h-11 border-slate-300 focus:border-emerald-500 w-full cursor-pointer"
                       >
                         <SelectValue placeholder="Оберіть тип" />
                       </SelectTrigger>
@@ -232,9 +232,9 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
                               suppressHydrationWarning
                               onClick={() => {
                                 setPage(1);
-                                handleSearch(0,true);
+                                handleSearch(1,true);
                               }}
-                              className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                              className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                             >
                               <Search className="w-4 h-4 mr-2" />
                               Підібрати авто

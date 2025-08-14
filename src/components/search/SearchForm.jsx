@@ -15,7 +15,7 @@ import { Search, Star, Car, Calendar, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CAR_DATA from "../../../public/data/cars.json";
 
-export default function SearchForm({ onSearch }) {
+export default function SearchForm() {
   const router = useRouter();
   const [filters, setFilters] = useState({
     brand: "",
@@ -117,7 +117,7 @@ export default function SearchForm({ onSearch }) {
                 value={filters.brand}
                 onValueChange={(value) => handleFilterChange("brand", value)}
               >
-                <SelectTrigger className="h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 w-full">
+                <SelectTrigger className="h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 w-full cursor-pointer">
                   <SelectValue placeholder="Оберіть марку" />
                 </SelectTrigger>
                 <SelectContent>
@@ -141,7 +141,7 @@ export default function SearchForm({ onSearch }) {
                 onValueChange={(value) => handleFilterChange("model", value)}
                 disabled={!filters.brand}
               >
-                <SelectTrigger className="h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 w-full">
+                <SelectTrigger className="h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 w-full cursor-pointer">
                   <SelectValue placeholder="Оберіть модель" />
                 </SelectTrigger>
                 <SelectContent>
@@ -166,7 +166,7 @@ export default function SearchForm({ onSearch }) {
                 onValueChange={(value) => handleFilterChange("yearfrom", value)}
               >
                 <SelectTrigger
-                  className={`h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 ${error ? "border-red-300" : ""} w-full`}
+                  className={`h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 ${error ? "border-red-300" : ""} w-full cursor-pointer`}
                 >
                   <SelectValue placeholder="Від року" />
                 </SelectTrigger>
@@ -191,7 +191,7 @@ export default function SearchForm({ onSearch }) {
                 onValueChange={(value) => handleFilterChange("yearTo", value)}
               >
                 <SelectTrigger
-                  className={`h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 ${error ? "border-red-300" : ""} w-full`}
+                  className={`h-12 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 ${error ? "border-red-300" : ""} w-full cursor-pointer`}
                 >
                   <SelectValue placeholder="До року" />
                 </SelectTrigger>
@@ -210,7 +210,7 @@ export default function SearchForm({ onSearch }) {
             <Button
               onClick={handleAnalyze}
               disabled={!isFormValid}
-              className="h-14 px-12 text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+              className="h-14 px-12 text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:transform-none cursor-pointer"
             >
               <Search className="w-6 h-6 mr-3" />
               Аналізувати ціни

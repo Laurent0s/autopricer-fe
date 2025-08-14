@@ -432,7 +432,7 @@ export default function PriceAnalysisPage() {
               <Button
                 variant="outline"
                 size="icon"
-                className="hover:bg-blue-50 hover:border-blue-300 flex-shrink-0"
+                className="hover:bg-blue-50 hover:border-blue-300 flex-shrink-0 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
@@ -503,7 +503,7 @@ export default function PriceAnalysisPage() {
                       handleFilterChange("brand", value)
                     }
                   >
-                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full">
+                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full cursor-pointer">
                       <SelectValue placeholder="Оберіть марку" />
                     </SelectTrigger>
                     <SelectContent>
@@ -526,7 +526,7 @@ export default function PriceAnalysisPage() {
                     }
                     disabled={!filters.brand}
                   >
-                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full">
+                    <SelectTrigger className="h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 w-full cursor-pointer">
                       <SelectValue placeholder="Оберіть модель" />
                     </SelectTrigger>
                     <SelectContent>
@@ -550,7 +550,7 @@ export default function PriceAnalysisPage() {
                     }
                   >
                     <SelectTrigger
-                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""} w-full`}
+                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""} w-full cursor-pointer`}
                     >
                       <SelectValue placeholder="Від року" />
                     </SelectTrigger>
@@ -574,7 +574,7 @@ export default function PriceAnalysisPage() {
                     }
                   >
                     <SelectTrigger
-                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""} w-full`}
+                      className={`h-12 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 ${error.includes("Неможливо почати пошук") ? "border-red-300" : ""} w-full cursor-pointer`}
                     >
                       <SelectValue placeholder="До року" />
                     </SelectTrigger>
@@ -593,6 +593,7 @@ export default function PriceAnalysisPage() {
               <div className="mb-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <Switch
+                    className="cursor-pointer"
                     id="compare-mode"
                     checked={isCompareMode}
                     onCheckedChange={(checked) => {
@@ -602,7 +603,7 @@ export default function PriceAnalysisPage() {
                   />
                   <Label
                     htmlFor="compare-mode"
-                    className="font-medium text-slate-700 cursor-pointer"
+                    className="font-medium text-slate-700"
                   >
                     Порівняти з іншим авто
                   </Label>
@@ -623,7 +624,7 @@ export default function PriceAnalysisPage() {
                           handleFilterChange2("brand", value)
                         }
                       >
-                        <SelectTrigger className="w-full h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white">
+                        <SelectTrigger className="w-full h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white cursor-pointer">
                           <SelectValue placeholder="Оберіть марку" />
                         </SelectTrigger>
                         <SelectContent>
@@ -646,7 +647,7 @@ export default function PriceAnalysisPage() {
                         }
                         disabled={!filters2.brand}
                       >
-                        <SelectTrigger className="w-full h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white">
+                        <SelectTrigger className="w-full h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 bg-white cursor-pointer">
                           <SelectValue placeholder="Оберіть модель" />
                         </SelectTrigger>
                         <SelectContent>
@@ -691,7 +692,7 @@ export default function PriceAnalysisPage() {
                     />
                     <Label
                       htmlFor="exclude-usa"
-                      className="text-sm text-slate-700 flex items-center cursor-pointer"
+                      className="text-sm text-slate-700 flex items-center"
                     >
                       🇺🇸 Прибрати авто з США
                     </Label>
@@ -729,7 +730,7 @@ export default function PriceAnalysisPage() {
                           handleFilterChange("bodyType", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
+                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full cursor-pointer">
                           <SelectValue placeholder="Оберіть тип" />
                         </SelectTrigger>
                         <SelectContent>
@@ -759,7 +760,7 @@ export default function PriceAnalysisPage() {
                           handleFilterChange("fuel", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
+                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full cursor-pointer">
                           <SelectValue placeholder="Оберіть тип" />
                         </SelectTrigger>
                         <SelectContent>
@@ -786,16 +787,16 @@ export default function PriceAnalysisPage() {
                           handleFilterChange("transmission", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
+                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full cursor-pointer">
                           <SelectValue placeholder="Оберіть тип" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="All">Всі типи</SelectItem>
+                          <SelectItem value="Автомат">Автомат</SelectItem>
                           <SelectItem value="Ручна / Механіка">
                             Ручна / Механіка
                           </SelectItem>
                           <SelectItem value="Типтронік">Типтронік</SelectItem>
-                          <SelectItem value="Автомат">Автомат</SelectItem>
                           <SelectItem value="Робот">Робот</SelectItem>
                           <SelectItem value="Варіатор">Варіатор</SelectItem>
                         </SelectContent>
@@ -813,7 +814,7 @@ export default function PriceAnalysisPage() {
                           handleFilterChange("driveType", value)
                         }
                       >
-                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
+                        <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full cursor-pointer">
                           <SelectValue placeholder="Оберіть тип" />
                         </SelectTrigger>
                         <SelectContent>

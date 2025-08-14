@@ -91,12 +91,10 @@ export default function BudgetFinderPage() {
   };
 
   const handleSearch = (pageArg?: number, clicked?: boolean) => {
-    setIsSearching(true);
     setError("");
-    setResults([]);
+    setResults([])
     if(!filters.price && clicked) {
       setError('Будь ласка оберіть ваш бюджет');
-      setIsSearching(false);
       return null;
     }
     if(!pageArg) {
@@ -104,10 +102,10 @@ export default function BudgetFinderPage() {
     } else {
       loadData(pageArg);
     }
-    setIsSearching(false);
   };
 
   const loadData = useCallback(async (pageArg?: number) => {
+    setIsSearching(true);
     setError("");
     setFound((prev) => prev + 1);
     const data = await dispatch(
@@ -134,6 +132,7 @@ export default function BudgetFinderPage() {
         engineTo: filters?.engineTo ?? null,
       }),
     ).unwrap();
+    setIsSearching(false);
     setResults(data.data);
     setTotalOffers(Number(data.totalOffers));
   }, [dispatch,filters, page, limit]);
@@ -268,7 +267,7 @@ export default function BudgetFinderPage() {
                 >
                   <SelectTrigger
                     suppressHydrationWarning
-                    className=" border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20 w-full"
+                    className=" border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20 w-full cursor-pointer"
                   >
                     <SelectValue placeholder="Від року" />
                   </SelectTrigger>
@@ -292,7 +291,7 @@ export default function BudgetFinderPage() {
                 >
                   <SelectTrigger
                     suppressHydrationWarning
-                    className="h-12 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20 w-full"
+                    className="h-12 border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20 w-full cursor-pointer"
                   >
                     <SelectValue placeholder="До року" />
                   </SelectTrigger>
@@ -336,7 +335,7 @@ export default function BudgetFinderPage() {
                   />
                   <Label
                     htmlFor="exclude-usa"
-                    className="text-sm text-slate-700 flex items-center cursor-pointer"
+                    className="text-sm text-slate-700 flex items-center"
                   >
                     🇺🇸 Прибрати авто з США
                   </Label>
@@ -377,7 +376,7 @@ export default function BudgetFinderPage() {
                                             handleFilterChange("bodyType", value)
                                           }
                                         >
-                                          <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full">
+                                          <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 w-full cursor-pointer">
                                             <SelectValue placeholder="Оберіть тип" />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -409,7 +408,7 @@ export default function BudgetFinderPage() {
                     >
                       <SelectTrigger
                         suppressHydrationWarning
-                        className="h-11 border-slate-300 focus:border-emerald-500 w-full"
+                        className="h-11 border-slate-300 focus:border-emerald-500 w-full cursor-pointer"
                       >
                         <SelectValue placeholder="Оберіть тип" />
                       </SelectTrigger>
@@ -439,16 +438,16 @@ export default function BudgetFinderPage() {
                     >
                       <SelectTrigger
                         suppressHydrationWarning
-                        className="h-11 border-slate-300 focus:border-emerald-500 w-full"
+                        className="h-11 border-slate-300 focus:border-emerald-500 w-full cursor-pointer"
                       >
                         <SelectValue placeholder="Оберіть тип" />
                       </SelectTrigger>
                       <SelectContent suppressHydrationWarning>
                         <SelectItem value="All">Всі типи</SelectItem>
+                        <SelectItem value="Автомат">Автомат</SelectItem>
                         <SelectItem value="Ручна / Механіка">
                           Ручна / Механіка
                         </SelectItem>
-                        <SelectItem value="Автомат">Автомат</SelectItem>
                         <SelectItem value="Типтронік">Типтронік</SelectItem>
                         <SelectItem value="Робот">Робот</SelectItem>
                         <SelectItem value="Варіатор">Варіатор</SelectItem>
@@ -469,7 +468,7 @@ export default function BudgetFinderPage() {
                     >
                       <SelectTrigger
                         suppressHydrationWarning
-                        className="h-11 border-slate-300 focus:border-emerald-500 w-full"
+                        className="h-11 border-slate-300 focus:border-emerald-500 w-full cursor-pointer"
                       >
                         <SelectValue placeholder="Оберіть тип" />
                       </SelectTrigger>
@@ -570,22 +569,6 @@ export default function BudgetFinderPage() {
               />
             </div>
           </motion.div>
-        )}
-
-        {!!isSearching && (
-          <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="mb-8"
-                    >
-                      <Card className="h-72 flex flex-col justify-center items-center shadow-lg">
-                        <CardContent>
-                          <h2 className="text-2xl md:text-3xl font-bold text-slate-500 mb-2">
-                          Почніть пошук, щоб переглянути дані.
-                        </h2></CardContent>
-                      </Card>
-                    </motion.div>
         )}
       </div>
     </div>
