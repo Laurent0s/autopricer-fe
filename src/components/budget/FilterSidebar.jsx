@@ -232,7 +232,7 @@ export default function FilterSidebar({CAR_DATA, filters, handleFilterChange, ye
                               suppressHydrationWarning
                               onClick={() => {
                                 setPage(1);
-                                handleSearch(true);
+                                handleSearch(0,true);
                               }}
                               className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                             >

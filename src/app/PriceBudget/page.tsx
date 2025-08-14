@@ -99,10 +99,11 @@ export default function BudgetFinderPage() {
       setIsSearching(false);
       return null;
     }
-    if(pageArg) {
+    if(!pageArg) {
       setPage(1);
+    } else {
+      loadData(pageArg);
     }
-    loadData(page);
     setIsSearching(false);
   };
 
@@ -138,7 +139,7 @@ export default function BudgetFinderPage() {
   }, [dispatch,filters, page, limit]);
 
   useEffect(() => {
-    handleSearch();
+    handleSearch(page);
   }, [page, limit]);
 
   const [mileageDraft, setMileageDraft] = useState<RangeTuple>([
