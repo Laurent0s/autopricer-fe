@@ -49,9 +49,6 @@ type ModelData = {
 };
 
 type RangeTuple = number[];
-type fuel = "Бензин" | "Дизель" | "гібрид" | "електро" | "All" | "Газ";
-type transmissionType = "Механіка" | "Автомат" | "Робот" | "Варіатор" | "All";
-type driveType = "fwd" | "rwd" | "awd" | "All";
 
 type SearchFilterMap = {
   brand: keyof typeof CAR_DATA;
@@ -60,9 +57,9 @@ type SearchFilterMap = {
   yearfrom?: number | null;
   yearTo?: number | null;
   bodyType?: string | null;
-  fuel?: fuel | null;
-  transmission?: transmissionType | null;
-  driveType?: driveType | null;
+  fuel?: string[] | null;
+  transmission?: string[] | null;
+  driveType?: string[] | null;
   mileageFrom?: number | null;
   mileageTo?: number | null;
   engineFrom: number | null;
@@ -108,13 +105,13 @@ export default function PriceAnalysisPage() {
           yearTo: searchFilters.yearTo ?? null,
           bodyType: searchFilters.bodyType ?? null,
           fuel:
-            searchFilters.fuel === "All" ? null : (searchFilters.fuel ?? null),
+            searchFilters.fuel?.includes('All') ? null : (searchFilters.fuel ?? null),
           transmission:
-            searchFilters.transmission === "All"
+            searchFilters.transmission?.includes('All')
               ? null
               : (searchFilters.transmission ?? null),
           driveType:
-            searchFilters.driveType === "All"
+            searchFilters.transmission?.includes('All')
               ? null
               : (searchFilters.driveType ?? null),
           mileageFrom: searchFilters.mileageFrom ?? null,
@@ -139,15 +136,15 @@ export default function PriceAnalysisPage() {
             yearTo: searchFilters.yearTo ?? null,
             bodyType: searchFilters.bodyType ?? null,
             fuel:
-              searchFilters.fuel === "All"
+              searchFilters.fuel?.includes('All')
                 ? null
                 : (searchFilters.fuel ?? null),
             transmission:
-              searchFilters.transmission === "All"
+              searchFilters.transmission?.includes('All')
                 ? null
                 : (searchFilters.transmission ?? null),
             driveType:
-              searchFilters.driveType === "All"
+              searchFilters.transmission?.includes('All')
                 ? null
                 : (searchFilters.driveType ?? null),
             mileageFrom: searchFilters.mileageFrom ?? null,
@@ -258,6 +255,13 @@ export default function PriceAnalysisPage() {
     for (const [rawKey, rawValue] of urlParams.entries()) {
       if (rawKey === "excludeUSA") {
         setExcludeUSA(rawValue === "true");
+        continue;
+      }
+      if (['transmission', 'fuel', 'driveType'].includes(rawKey)) {
+        searchFilters = {
+          ...searchFilters,
+          [rawKey]: rawValue.split(','),
+        };
         continue;
       }
       if (isFilterKey(rawKey)) {
@@ -376,19 +380,6 @@ export default function PriceAnalysisPage() {
     navigator.clipboard.writeText(window.location.href);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2500);
-  };
-
-  const handleGoToCalculator = () => {
-    const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        if (Array.isArray(value)) {
-          params.set(key, value.join(","));
-        } else {
-          params.set(key, String(value));
-        }
-      }
-    });
   };
 
   const [mileageDraft, setMileageDraft] = useState<RangeTuple>([

@@ -11,7 +11,6 @@ export default function YearlyMetricsCards({
   quantity1,
   quantity2,
 }) {
-  console.log(averagePriceFrom1);
   const metrics = [
     {
       title: "Діапазон цін",

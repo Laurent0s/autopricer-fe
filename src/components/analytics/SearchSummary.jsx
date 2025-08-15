@@ -40,7 +40,8 @@ export default function SearchSummary({ filters, filters2 }) {
       bodyType: "Кузов",
       driveType: "Привід",
       mileageRange: "Пробіг",
-      engineVolume: "Об'єм",
+      engineFrom: "Двигун від",
+      engineTo: "Двигун до",
     };
     return labels[key] || key;
   };

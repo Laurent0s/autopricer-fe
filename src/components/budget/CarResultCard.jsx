@@ -30,15 +30,18 @@ export default function CarResultCard({ car, handleAnalysisSearch }) {
   } else {
     yearfrom = years;
   }
+  console.log([...car.fuel.split(', ')])
   const carData = {
     brand: car.brand,
     model: car.model,
     yearfrom: yearfrom ?? null,
     yearTo: yearTo ?? null,
     bodyType: car.bodyType ?? null,
-    fuel: fuel ?? null,
-    transmission: transmission ?? null,
-    driveType: car.driveType ?? null,
+    fuel: car.fuel ? (car.fuel.includes(', ') ? car.fuel.split(', ') : car.fuel) : null,
+    transmission: car.transmission.split(', ') ?? null,
+    driveType: car.drive ? (car.drive.includes(', ') ? car.drive.split(', ') : car.drive) : null,
+    engineFrom: car.engine ? (car.engine?.includes(', ') ? car.engine?.split(', ')[0] : car.engine) : null,
+    engineTo: car.engine ? (car.engine?.includes(', ') ? car.engine?.split(', ')[car.engine?.split(', ').length - 1] : car.engine) : null,
   };
   return (
     <Card className="overflow-hidden shadow-lg border-0 hover:shadow-xl transition-shadow duration-300 w-full p-6">
@@ -80,7 +83,7 @@ export default function CarResultCard({ car, handleAnalysisSearch }) {
               </div>
             </div>
 
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => 
+            <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer" onClick={() => 
               handleAnalysisSearch(carData)
               }>
               <BarChart2 className="w-4 h-4 mr-2" />

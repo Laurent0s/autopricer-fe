@@ -175,6 +175,7 @@ export default function BudgetFinderPage() {
   }
 
   const handleAnalysisSearch = (Filters: SearchFilters) => {
+    console.log(Filters);
     const params = new URLSearchParams();
     Object.entries(Filters).forEach(([k, v]) => {
       if (v && v !== "") {
